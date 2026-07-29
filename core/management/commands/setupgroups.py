@@ -36,10 +36,9 @@ class Command(BaseCommand):
         
         teachers = Group.objects.create(
             name = "Teachers",
-            permissions = [view_permissions]
         )
 
-        teachers.permissions.add(view_permissions)
+        teachers.permissions.set(view_permissions)
 
         # Mentors Group
         Group.objects.create(
