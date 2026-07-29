@@ -8,13 +8,11 @@
         <ul class="flex space-x-4">
             <li><a href="/" class="hover:text-blue-200">Home</a></li>
             <li><a href="/mission/" class="hover:text-blue-200">Our Mission</a></li>
-            { % if request.user.is_authenticated % }
-                
-
-                { % if request.user.is_staff % }
+            {% if request.user.is_authenticated %}
+                {% if request.user.is_staff %}
                     <li><a href="/management/" class="hover:text-blue-200">Admin Panel</a></li>
-                { % endif % }
-            { % endif % }
+                {% endif %}
+            {% endif %}
         </ul>
     </div>
 </nav>
