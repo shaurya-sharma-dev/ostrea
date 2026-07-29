@@ -16,7 +16,7 @@ class CustomUser(AbstractUser):
 
             return self.groups.contains(group)
         except Group.DoesNotExist:
-            logging.warning("The students group does not exist. Run python manage.py setupgroups to create it.")
+            logger.warning("The students group does not exist. Run python manage.py setupgroups to create it.")
             return False
 
     @property
@@ -29,7 +29,7 @@ class CustomUser(AbstractUser):
 
             return self.groups.contains(group)
         except Group.DoesNotExist:
-            logging.warning("The teachers group does not exist. Run python manage.py setupgroups to create it.")
+            logger.warning("The teachers group does not exist. Run python manage.py setupgroups to create it.")
             return False
 
     @property
@@ -42,5 +42,5 @@ class CustomUser(AbstractUser):
 
             return self.groups.contains(group)
         except Group.DoesNotExist:
-            logging.warning("The mentors group does not exist. Run python manage.py setupgroups to create it.")
+            logger.warning("The mentors group does not exist. Run python manage.py setupgroups to create it.")
             return False
