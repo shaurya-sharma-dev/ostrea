@@ -1,0 +1,20 @@
+<nav class="fixed top-0 left-0 w-full bg-blue-500 dark:bg-black text-white p-4 shadow-md z-50">
+    <div class="container mx-auto flex justify-between items-center">
+        <span class="flex items-center">
+        <a href="/"><img src="/favicon.svg" alt="Logo" width="50" /></a>
+            
+        <a href="/" class="text-xl font-bold" style="padding-left: 0.5em;">Ostrea</a>
+        </span>
+        <ul class="flex space-x-4">
+            <li><a href="/" class="hover:text-blue-200">Home</a></li>
+            <li><a href="/mission/" class="hover:text-blue-200">Our Mission</a></li>
+            { % if request.user.is_authenticated % }
+                
+
+                { % if request.user.is_staff % }
+                    <li><a href="/management/" class="hover:text-blue-200">Admin Panel</a></li>
+                { % endif % }
+            { % endif % }
+        </ul>
+    </div>
+</nav>
