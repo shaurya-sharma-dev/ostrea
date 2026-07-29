@@ -1,0 +1,17 @@
+[project]
+name = "Ostrea"
+version = "0.1.0"
+description = "Ostrea is an educational website about oyster gardening."
+authors = [
+    { name = "Shaurya Sharma" },
+    { name = "Shreya Sharma" }
+]
+dependencies = ["Django==6.0.7", "django-allauth==65.18.0"]
+requires-python = "==3.12.*"
+readme = "README.md"
+license = "MPL-2.0"
+license-files = ["LICENSE*]
+
+
+[tool.pdm]
+distribution = false
