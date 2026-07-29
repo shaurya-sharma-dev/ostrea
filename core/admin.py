@@ -1,6 +1,8 @@
 from django.contrib import admin
 from django.contrib.auth import get_user_model
+from django.contrib.auth.models import Group
 from django.contrib.auth.admin import UserAdmin
+from django.db.models import Exists, OuterRef
 import logging
 
 # Register your models here.
@@ -32,8 +34,15 @@ class CustomUserAdmin(UserAdmin):
             return User.objects.none()
 
         admin_group_ids = request.user.groups.values_list('id', flat=True)
+
+        student_group_membership = Group.objects.filter(
+            name="Students",
+            user=OuterRef("pk"),
+        )
         
-        return qs.filter(
-            is_student=True,                    # Must be a student
+        return qs.annotate(
+            is_student_group=Exists(student_group_membership)
+        ).filter(
+            is_student_group=True,              # Must be a student
             groups__id__in=admin_group_ids      # Shares a group with the teacher
         ).distinct() # distinct() prevents row duplicates if users share multiple groups
