@@ -1,0 +1,49 @@
+from django.core.management.base import BaseCommand, CommandError
+from django.contrib.auth.models import Group, Permission
+from django.contrib.auth import get_user_model
+from django.contrib.contenttypes.models import ContentType
+
+class Command(BaseCommand):
+    help = "Sets up the required user groups."
+
+    def handle(self, *args, **options):
+        # Output warning message
+        self.stdout.write(self.style.WARNING("WARNING: This will permanently all groups and recreate them!"))
+
+        # Ask for confirmation
+        confirm = None
+        while confirm not in ["y", "n"]:
+            confirm = input("Are you sure you want to continue? [y/n]: ").lower()
+        
+        if confirm != "y":
+            raise CommandError("Operation canceled.")
+
+        # Delete all groups
+        Group.objects.all().delete()
+
+        # Add new groups
+
+        # Students Group
+        Group.objects.create(
+            name = "Students"
+        )
+
+        # Teachers Group
+        User = get_user_model()
+        content_type = ContentType.objects.get_for_model(User)
+        permissions = Permission.objects.filter(content_type=content_type)
+        view_permissions = permissions.filter(codename__startswith='view_')
+        
+        teachers = Group.objects.create(
+            name = "Teachers",
+            permissions = [view_permissions]
+        )
+
+        teachers.permissions.add(view_permissions)
+
+        # Mentors Group
+        Group.objects.create(
+            name = "Mentors"
+        )
+
+        self.stdout.write(self.style.SUCCESS('Successfully created groups.'))
