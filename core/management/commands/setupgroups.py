@@ -25,6 +25,11 @@ class Command(BaseCommand):
         if confirm != "y":
             raise CommandError("Operation canceled.")
 
+        self._logic()
+
+        self.stdout.write(self.style.SUCCESS('Successfully created groups.'))
+
+    def _logic(self):
         # Delete all groups
         Group.objects.all().delete()
 
@@ -60,5 +65,3 @@ class Command(BaseCommand):
 
         mentors.permissions.set(oyster_permissions)
         mentors.permissions.add(*log_permissions)
-
-        self.stdout.write(self.style.SUCCESS('Successfully created groups.'))
