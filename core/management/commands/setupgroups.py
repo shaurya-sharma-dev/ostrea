@@ -59,6 +59,6 @@ class Command(BaseCommand):
         )
 
         mentors.permissions.set(oyster_permissions)
-        mentors.permissions.add(log_permissions)
+        mentors.permissions.add(*log_permissions)
 
         self.stdout.write(self.style.SUCCESS('Successfully created groups.'))
