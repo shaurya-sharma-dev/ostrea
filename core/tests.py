@@ -181,3 +181,30 @@ def set_up_test_data(password: str):
         "logs": (log1, log2),
         "superuser": superuser
     }
+
+class TestCustomUserAdmin(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.data = set_up_test_data("areallylongfillerpassword")
+        cls.factory = RequestFactory()
+
+    def setUp(self):
+        self.model_admin = CustomUserAdmin(User, AdminSite())
+
+    def test_teachers_can_only_see_their_students(self):
+        for index in range(2):
+            with self.subTest(index=index):
+                teacher = self.data["teachers"][index]
+                request = self.factory.get("")
+                request.user = teacher
+
+                qs = self.model_admin.get_queryset(request)
+
+                self.assertIn(self.data["students"][index], qs)
+                self.assertIn(teacher, qs)
+
+                self.assertNotIn(self.data["students"][(index + 1) % 2], qs)
+                self.assertNotIn(self.data["teachers"][(index + 1) % 2], qs)
+
+                # The queryset should have the teacher and student.
+                self.assertEqual(qs.count(), 2, "Queryset has more than two users.")
