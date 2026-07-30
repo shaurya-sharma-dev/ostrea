@@ -11,7 +11,7 @@ class CustomUser(AbstractUser):
         "Is the user in the student group?"
         try:
             group = Group.objects.get(
-                name = "Students"
+                name = "Access Group: Students"
             )
 
             return self.groups.contains(group)
@@ -24,7 +24,7 @@ class CustomUser(AbstractUser):
         "Is the user in the teacher group?"
         try:
             group = Group.objects.get(
-                name = "Teachers"
+                name = "Access Group: Teachers"
             )
 
             return self.groups.contains(group)
@@ -37,7 +37,7 @@ class CustomUser(AbstractUser):
         "Is the user in the mentor group?"
         try:
             group = Group.objects.get(
-                name = "Mentors"
+                name = "Access Group: Mentors"
             )
 
             return self.groups.contains(group)

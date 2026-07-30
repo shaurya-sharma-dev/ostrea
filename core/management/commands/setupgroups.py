@@ -4,7 +4,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.contenttypes.models import ContentType
 
 class Command(BaseCommand):
-    help = "Sets up the required user groups."
+    help = "Sets up the required user access groups."
 
     def handle(self, *args, **options):
         # Output warning message
@@ -25,7 +25,7 @@ class Command(BaseCommand):
 
         # Students Group
         Group.objects.create(
-            name = "Students"
+            name = "Access Group: Students"
         )
 
         # Teachers Group
@@ -35,14 +35,14 @@ class Command(BaseCommand):
         view_permissions = permissions.filter(codename__startswith='view_')
         
         teachers = Group.objects.create(
-            name = "Teachers",
+            name = "Access Group: Teachers",
         )
 
         teachers.permissions.set(view_permissions)
 
         # Mentors Group
         Group.objects.create(
-            name = "Mentors"
+            name = "Access Group: Mentors"
         )
 
         self.stdout.write(self.style.SUCCESS('Successfully created groups.'))
