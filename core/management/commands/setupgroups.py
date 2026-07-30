@@ -8,7 +8,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         # Output warning message
-        self.stdout.write(self.style.WARNING("WARNING: This will permanently all groups and recreate them!"))
+        self.stdout.write(self.style.WARNING("WARNING: This will permanently delete all pre-existing groups!"))
 
         # Ask for confirmation
         confirm = None
