@@ -16,6 +16,8 @@ class CustomUserAdmin(UserAdmin):
     """
     Custom Admin for CustomUser model ensuring proper data privacy.
     """
+
+    readonly_fields = ("date_joined", "last_login")
     
     def get_queryset(self, request):
         # Fetch default queryset.
