@@ -130,6 +130,9 @@ ACCOUNT_ADAPTER = "core.adapters.NoSignupAccountAdapter"
 # Custom user model
 AUTH_USER_MODEL = "core.CustomUser"
 
+# Redirect to homepage after a login
+LOGIN_REDIRECT_URL = "/"
+
 # Internationalization
 # https://docs.djangoproject.com/en/6.0/topics/i18n/
 
