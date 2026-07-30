@@ -8,6 +8,7 @@ from django.core.management.base import BaseCommand, CommandError
 from django.contrib.auth.models import Group, Permission
 from django.contrib.auth import get_user_model
 from django.contrib.contenttypes.models import ContentType
+from core.models import Oyster, OysterLog
 
 class Command(BaseCommand):
     help = "Sets up the required user access groups."
@@ -36,19 +37,28 @@ class Command(BaseCommand):
 
         # Teachers Group
         User = get_user_model()
-        content_type = ContentType.objects.get_for_model(User)
-        permissions = Permission.objects.filter(content_type=content_type)
-        view_permissions = permissions.filter(codename__startswith='view_')
+        user_content_type = ContentType.objects.get_for_model(User)
+        user_permissions = Permission.objects.filter(content_type=user_content_type)
+        user_view_permissions = user_permissions.filter(codename__startswith='view_')
         
         teachers = Group.objects.create(
             name = "Access Group: Teachers",
         )
 
-        teachers.permissions.set(view_permissions)
+        teachers.permissions.set(user_view_permissions)
 
         # Mentors Group
-        Group.objects.create(
+        log_content_type = ContentType.objects.get_for_model(OysterLog)
+        log_permissions = Permission.objects.filter(content_type=log_content_type)
+
+        oyster_content_type = ContentType.objects.get_for_model(Oyster)
+        oyster_permissions = Permission.objects.filter(content_type=oyster_content_type)
+
+        mentors = Group.objects.create(
             name = "Access Group: Mentors"
         )
+
+        mentors.permissions.set(oyster_permissions)
+        mentors.permissions.add(log_permissions)
 
         self.stdout.write(self.style.SUCCESS('Successfully created groups.'))
