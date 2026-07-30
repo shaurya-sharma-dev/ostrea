@@ -29,14 +29,14 @@ class Command(BaseCommand):
 
         self.stdout.write(self.style.SUCCESS('Successfully created groups.'))
 
-    def _logic(self):
+    def _logic(self) -> dict[str, Group]:
         # Delete all groups
         Group.objects.all().delete()
 
         # Add new groups
 
         # Students Group
-        Group.objects.create(
+        students = Group.objects.create(
             name = "Access Group: Students"
         )
 
@@ -65,3 +65,9 @@ class Command(BaseCommand):
 
         mentors.permissions.set(oyster_permissions)
         mentors.permissions.add(*log_permissions)
+
+        return {
+            "students": students,
+            "teachers": teachers,
+            "mentors": mentors,
+        }
