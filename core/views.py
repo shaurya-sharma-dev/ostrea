@@ -7,3 +7,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 from django.shortcuts import render
 
 # Create your views here.
+def index(request):
+    return render(request, "core/index.html")
+
+def mission(request):
+    return render(request, "core/mission.html")

@@ -1,20 +1,25 @@
-<!--
-This Source Code Form is subject to the terms of the Mozilla Public
+<!-- This Source Code Form is subject to the terms of the Mozilla Public
 License, v. 2.0. If a copy of the MPL was not distributed with this
-file, You can obtain one at http://mozilla.org/MPL/2.0/.
- -->
+file, You can obtain one at http://mozilla.org/MPL/2.0/. -->
 
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %} {% endblock title %}</title>
-    {% block extrahead %} {% endblock extrahead %}
+    <title>{% block title %}Ostrea{% endblock title %}</title>
+    {% block extrahead %} 
+        <link rel="stylesheet" href="{% static 'output.css' %}">
+    {% endblock extrahead %}
+    <link rel="manifest" href="{% static 'site.webmanifest' %}">
+    <link rel="shortcut icon" href="{% static 'favicon.ico' %}" type="image/x-icon">
 </head>
 <body>
     {% include "core/navbar.html" %}
+    <div id="content">
     {% block content %} {% endblock content %}
+    </div>
     {% block extrabody %} {% endblock extrabody %}
 </body>
 </html>

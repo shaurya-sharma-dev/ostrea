@@ -4,10 +4,11 @@ License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at http://mozilla.org/MPL/2.0/.
 {% endcomment %}
 
+{% load static %}
 <nav class="fixed top-0 left-0 w-full bg-blue-500 dark:bg-black text-white p-4 shadow-md z-50">
     <div class="container mx-auto flex justify-between items-center">
         <span class="flex items-center">
-        <a href="/"><img src="/favicon.svg" alt="Logo" width="50" /></a>
+        <a href="/"><img src="{% static 'android-chrome-192x192.png' %}" alt="Logo" width="50" /></a>
             
         <a href="/" class="text-xl font-bold" style="padding-left: 0.5em;">Ostrea</a>
         </span>
@@ -18,9 +19,56 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
                 {% if request.user.is_staff %}
                     <li><a href="/management/" class="hover:text-blue-200">Admin Panel</a></li>
                 {% endif %}
-
-                <li><a href="/accounts/logout/" class="hover:text-blue-200">Logout</a></li>
             {% endif %}
+
+            <li class="relative">
+                <details class="group">
+                <!-- Trigger Button with background states -->
+                <summary class="flex cursor-pointer list-none items-center space-x-1 rounded-md hover:text-blue-200 focus:outline-none transition [&::-webkit-details-marker]:hidden">
+                    <span>Account</span>
+                    <svg class="h-4 w-4 transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                    </svg>
+                </summary>
+
+                <!-- Dropdown Menu with background and borders -->
+                <ul class="absolute right-0 top-full mt-2 w-48 rounded-md bg-gray-800 p-1 text-gray-200 shadow-xl border border-gray-700 z-50">
+                    {% if request.user.is_authenticated %}
+                    <li>
+                    <a href="/accounts/email/" class="block rounded-md px-4 py-2 text-sm hover:bg-gray-700 hover:text-white transition">
+                        Manage Email
+                    </a>
+                    </li>
+                    <li>
+                    <a href="/accounts/password/change/" class="block rounded-md px-4 py-2 text-sm hover:bg-gray-700 hover:text-white transition">
+                        Change Password
+                    </a>
+                    </li>
+                    <li>
+                    <a href="/accounts/password/reset/" class="block rounded-md px-4 py-2 text-sm hover:bg-gray-700 hover:text-white transition">
+                        Forgot Password?
+                    </a>
+                    </li>
+                    <li>
+                    <a href="/accounts/logout/" class="block rounded-md px-4 py-2 text-sm hover:bg-gray-700 hover:text-white transition">
+                        Logout
+                    </a>
+                    </li>
+                    {% else %}
+                    <li>
+                    <a href="/accounts/login/" class="block rounded-md px-4 py-2 text-sm hover:bg-gray-700 hover:text-white transition">
+                        Sign In
+                    </a>
+                    </li>
+                    <li>
+                    <a href="/accounts/password/reset/" class="block rounded-md px-4 py-2 text-sm hover:bg-gray-700 hover:text-white transition">
+                        Forgot Password?
+                    </a>
+                    </li>
+                    {% endif %}
+                </ul>
+                </details>
+            </li>
         </ul>
     </div>
 </nav>

@@ -28,4 +28,5 @@ admin.site.index_title = "Home"
 urlpatterns = [
     path('accounts/', include('allauth.urls')),
     path('management/', admin.site.urls),
+    path('', include('core.urls')),
 ]
