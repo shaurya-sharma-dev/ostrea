@@ -12,7 +12,7 @@ from core.models import Oyster, OysterLog
 from django.contrib.admin.models import LogEntry
 from decimal import Decimal
 from django.contrib.admin.sites import AdminSite
-from .admin import CustomUserAdmin
+from .admin import CustomUserAdmin, GroupFilter
 
 # User model
 User = get_user_model()
@@ -208,3 +208,11 @@ class TestCustomUserAdmin(TestCase):
 
                 # The queryset should have the teacher and student.
                 self.assertEqual(qs.count(), 2, "Queryset has more than two users.")
+
+    def test_superuser_can_see_all_users(self):
+        request = self.factory.get("")
+        request.user = self.data["superuser"]
+
+        qs = self.model_admin.get_queryset(request)
+
+        self.assertEqual(qs.count(), User.objects.count(), "Superuser cannot see all users.")
