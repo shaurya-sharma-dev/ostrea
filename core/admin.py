@@ -105,9 +105,14 @@ class CustomUserAdmin(UserAdmin):
             user=OuterRef("pk"),
         )
         
-        return qs.annotate(
+        qs = qs.annotate(
             is_student_group=Exists(student_group_membership)
         ).filter(
             is_student_group=True,              # Must be a student
             groups__id__in=admin_group_ids      # Shares a group with the teacher
         ).distinct() # distinct() prevents row duplicates if users share multiple groups
+
+        instance_ids = list(qs.values_list('id', flat=True))
+        instance_ids.append(request.user.id)
+
+        return User.objects.filter(id__in=instance_ids)
