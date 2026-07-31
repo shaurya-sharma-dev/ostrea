@@ -10,6 +10,7 @@ from django.contrib.auth.models import Group
 from django.contrib.auth.admin import UserAdmin
 from django.db.models import Exists, OuterRef
 import logging
+from .models import Oyster
 
 # Register your models here.
 User = get_user_model()
@@ -122,3 +123,39 @@ class CustomUserAdmin(UserAdmin):
         instance_ids.append(request.user.id)
 
         return User.objects.filter(id__in=instance_ids)
+    
+# Custom OysterAdmin class
+@admin.register(Oyster)
+class OysterAdmin(admin.ModelAdmin):
+    """
+    Custom ModelAdmin for the Oyster model to ensure mentors can only modify their oysters.
+    """
+
+    def get_queryset(self, request):
+        # Fetch default queryset.
+        qs = super().get_queryset(request)
+        
+        # Superusers can always view oysters.
+        if request.user.is_superuser:
+            return qs
+        
+        is_mentor = request.user.is_mentor
+
+        if not is_mentor:
+            # If it is not a mentor, return an empty queryset.
+            # The user must have been given permissions incorrectly.
+            logger.warning("A user has view oysters permission without being a superuser or mentor. The system has not given them access to oysters.")
+            return User.objects.none()
+
+        qs = qs.filter(
+            mentor__id=request.user.id
+        ).distinct()
+
+        return qs
+
+    def delete_queryset(self, request, queryset):
+        # Intersect the submitted items with what the user is allowed to see
+        allowed_queryset = queryset & self.get_queryset(request)
+        
+        # Pass the filtered queryset to the default delete logic
+        super().delete_queryset(request, allowed_queryset)
