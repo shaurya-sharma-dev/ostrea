@@ -13,6 +13,7 @@ from django.contrib.admin.models import LogEntry
 from decimal import Decimal
 from django.contrib.admin.sites import AdminSite
 from .admin import CustomUserAdmin, GroupFilter
+from datetime import date
 
 # User model
 User = get_user_model()
@@ -160,15 +161,29 @@ def set_up_test_data(password: str):
         site_location="oyster2 site location",
     )
 
-    # Create two logs.
-    log1 = OysterLog.objects.create(
+    # Create two logs for each oyster.
+    log1_1 = OysterLog.objects.create(
         oyster=oyster1,
-        ph_level=Decimal("5.0"),
+        ph_level=Decimal("6.5"),
+        date=date(2026, 1, 1),
     )
 
-    log2 = OysterLog.objects.create(
+    log1_2 = OysterLog.objects.create(
+        oyster=oyster1,
+        ph_level=Decimal("7.3"),
+        date=date(2026, 1, 8),
+    )
+
+    log2_1 = OysterLog.objects.create(
         oyster=oyster2,
-        ph_level=Decimal("5.0"),
+        ph_level=Decimal("5.2"),
+        date=date(2026, 1, 1),
+    )
+
+    log2_2 = OysterLog.objects.create(
+        oyster=oyster2,
+        ph_level=Decimal("9.3"),
+        date=date(2026, 1, 8),
     )
 
     return {
@@ -178,7 +193,7 @@ def set_up_test_data(password: str):
         "students": (student1, student2),
         "mentors": (mentor1, mentor2),
         "oysters": (oyster1, oyster2),
-        "logs": (log1, log2),
+        "logs": ((log1_1, log1_2), (log2_1, log2_2)),
         "superuser": superuser
     }
 
