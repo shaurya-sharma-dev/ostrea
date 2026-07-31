@@ -2,6 +2,8 @@
 
 #content {
   padding-top: 108px;
-  padding-left: 10px;
-  padding-right: 10px;
+}
+
+body{
+    background-image: url('/static/light_bg.jpg');
 }

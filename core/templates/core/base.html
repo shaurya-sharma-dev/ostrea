@@ -17,8 +17,10 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/. -->
 </head>
 <body>
     {% include "core/navbar.html" %}
-    <div id="content">
+    <div id="content" class="container pt-1 mx-auto">
+    <div class="w-11/12 p-5 mx-auto mt-5 rounded-lg shadow-md md:w-9/12 lg:w-9/12 xl:w-9/12 bg-gray-50">
     {% block content %} {% endblock content %}
+    </div>
     </div>
     {% block extrabody %} {% endblock extrabody %}
 </body>

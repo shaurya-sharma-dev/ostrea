@@ -39,11 +39,6 @@ SOFTWARE.
             {% endblock head_title %}
         </title>
         <link rel="shortcut icon" href="{% static 'favicon.ico' %}" type="image/x-icon">
-        <style>
-            body{
-                background-image: url('{% static "light_bg.jpg" %}');
-            }
-        </style>
         {% block extra_head %}
             <link rel="stylesheet" href="{% static 'allauth_ui/output.css' %}">
             <link rel="stylesheet" href="{% static 'output.css' %}">
@@ -51,6 +46,7 @@ SOFTWARE.
     </head>
     <body class="min-h-screen bg-base-300">
         {% include "core/navbar.html" %}
+        <div id="content">
         {% block body %}
             {% if messages %}
                 {% for message in messages %}
@@ -65,5 +61,6 @@ SOFTWARE.
         {% endblock body %}
         {% block extra_body %}
         {% endblock extra_body %}
+        </div>
     </body>
 </html>

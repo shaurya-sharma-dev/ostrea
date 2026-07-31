@@ -10,6 +10,7 @@
     --color-blue-200: oklch(88.2% 0.059 254.128);
     --color-blue-500: oklch(62.3% 0.214 259.815);
     --color-blue-950: oklch(28.2% 0.091 267.935);
+    --color-gray-50: oklch(98.5% 0.002 247.839);
     --color-gray-200: oklch(92.8% 0.006 264.531);
     --color-gray-700: oklch(37.3% 0.034 259.733);
     --color-gray-800: oklch(27.8% 0.033 256.848);
@@ -26,6 +27,7 @@
     --text-4xl--line-height: calc(2.5 / 2.25);
     --font-weight-bold: 700;
     --radius-md: 0.375rem;
+    --radius-lg: 0.5rem;
     --blur-2xl: 40px;
     --default-transition-duration: 150ms;
     --default-transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
@@ -239,6 +241,9 @@
   .mt-2 {
     margin-top: calc(var(--spacing) * 2);
   }
+  .mt-5 {
+    margin-top: calc(var(--spacing) * 5);
+  }
   .ml-2 {
     margin-left: calc(var(--spacing) * 2);
   }
@@ -265,6 +270,9 @@
   }
   .w-4\/5 {
     width: calc(4 / 5 * 100%);
+  }
+  .w-11\/12 {
+    width: calc(11 / 12 * 100%);
   }
   .w-48 {
     width: calc(var(--spacing) * 48);
@@ -303,6 +311,9 @@
   .rounded-full {
     border-radius: calc(infinity * 1px);
   }
+  .rounded-lg {
+    border-radius: var(--radius-lg);
+  }
   .rounded-md {
     border-radius: var(--radius-md);
   }
@@ -315,6 +326,9 @@
   }
   .bg-blue-500 {
     background-color: var(--color-blue-500);
+  }
+  .bg-gray-50 {
+    background-color: var(--color-gray-50);
   }
   .bg-gray-800 {
     background-color: var(--color-gray-800);
@@ -331,11 +345,17 @@
   .p-4 {
     padding: calc(var(--spacing) * 4);
   }
+  .p-5 {
+    padding: calc(var(--spacing) * 5);
+  }
   .px-4 {
     padding-inline: calc(var(--spacing) * 4);
   }
   .py-2 {
     padding-block: calc(var(--spacing) * 2);
+  }
+  .pt-1 {
+    padding-top: var(--spacing);
   }
   .text-4xl {
     font-size: var(--text-4xl);
@@ -414,9 +434,22 @@
     outline-style: none;
   }
   @media (width >= 48rem) {
+    .md\:w-9\/12 {
+      width: calc(9 / 12 * 100%);
+    }
     .md\:text-base {
       font-size: var(--text-base);
       line-height: var(--tw-leading, var(--text-base--line-height));
+    }
+  }
+  @media (width >= 64rem) {
+    .lg\:w-9\/12 {
+      width: calc(9 / 12 * 100%);
+    }
+  }
+  @media (width >= 80rem) {
+    .xl\:w-9\/12 {
+      width: calc(9 / 12 * 100%);
     }
   }
   @media (prefers-color-scheme: dark) {
@@ -430,8 +463,9 @@
 }
 #content {
   padding-top: 108px;
-  padding-left: 10px;
-  padding-right: 10px;
+}
+body {
+  background-image: url('/static/light_bg.jpg');
 }
 @property --tw-space-x-reverse {
   syntax: "*";
