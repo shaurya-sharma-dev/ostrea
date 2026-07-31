@@ -53,6 +53,14 @@ class CustomUser(AbstractUser):
             logger.warning("The mentors group does not exist. Run python manage.py setupgroups to create it.")
             return False
 
+    @property
+    def display_name(self) -> str:
+        short_name = self.get_short_name()
+        if short_name:
+            return short_name
+
+        return self.username
+
 class Oyster(models.Model):
     mentor = models.ForeignKey(
         to=CustomUser, 
