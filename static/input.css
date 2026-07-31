@@ -1,6 +1,7 @@
 @import "tailwindcss";
 
 #content {
-  /* Adds spacing or layout to match your navbar padding */
-  padding-top: 96px; 
+  padding-top: 108px;
+  padding-left: 10px;
+  padding-right: 10px;
 }
