@@ -86,6 +86,9 @@ class Oyster(models.Model):
         blank=True, default=""
     )
 
+    def __str__(self):
+        return self.name
+
 class OysterLog(models.Model):
     class Meta:
         verbose_name = "Oyster Log"
