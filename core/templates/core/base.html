@@ -18,6 +18,16 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/. -->
 <body>
     {% include "core/navbar.html" %}
     <div id="content" class="container pt-1 mx-auto">
+    {% if messages %}
+        <div class="container mx-auto pt-1">
+        {% for message in messages %}
+            <div role="alert"
+                    class="text-sm md:text-base alert alert-{{ message.tags }} w-11/12 md:w-9/12 lg:w-9/12 xl:w-9/12 mx-auto bg-gray-50 p-5 rounded-full">
+                <span><strong>{{ message }}</strong></span>
+            </div>
+        {% endfor %}
+        </div>
+    {% endif %}
     <div class="w-11/12 p-5 mx-auto mt-5 rounded-lg shadow-md md:w-9/12 lg:w-9/12 xl:w-9/12 bg-gray-50">
     {% block content %} {% endblock content %}
     </div>

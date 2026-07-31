@@ -8,6 +8,6 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    path('mission/', views.mission),
-    path('', views.index),
+    path('dashboard/', views.dashboard, name="dashboard"),
+    path('', views.index, name="home"),
 ]
