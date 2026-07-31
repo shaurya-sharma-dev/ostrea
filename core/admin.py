@@ -123,6 +123,13 @@ class CustomUserAdmin(UserAdmin):
         instance_ids.append(request.user.id)
 
         return User.objects.filter(id__in=instance_ids)
+
+    def delete_queryset(self, request, queryset):
+        # Intersect the submitted items with what the user is allowed to see
+        allowed_queryset = queryset & self.get_queryset(request)
+        
+        # Pass the filtered queryset to the default delete logic
+        super().delete_queryset(request, allowed_queryset)
     
 # Custom OysterAdmin class
 @admin.register(Oyster)
