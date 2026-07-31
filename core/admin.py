@@ -138,6 +138,9 @@ class OysterAdmin(admin.ModelAdmin):
     Custom ModelAdmin for the Oyster model to ensure mentors can only modify their oysters.
     """
 
+    list_display = ("name", "site_name", "site_location", "deployment_date")
+    search_fields = ("name", "site_name", "site_location")
+
     def get_form(self, request, obj=None, change=False, **kwargs):
         form = super().get_form(request, obj, change, **kwargs)
         
