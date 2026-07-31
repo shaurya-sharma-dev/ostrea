@@ -138,6 +138,21 @@ class OysterAdmin(admin.ModelAdmin):
     Custom ModelAdmin for the Oyster model to ensure mentors can only modify their oysters.
     """
 
+    def save_model(self, request, obj, form, change):
+        if not change and not request.user.is_superuser:
+            obj.mentor = request.user
+        super().save_model(request, obj, form, change)
+
+    def get_form(self, request, obj=None, change=False, **kwargs):
+        form = super().get_form(request, obj, change, **kwargs)
+        # If this is the creation form, pre-populate the 'mentor' initial value
+        if not change:
+            form.base_fields["mentor"].initial = request.user
+
+            if not request.user.is_superuser:
+                form.base_fields["mentor"].widget.attrs["disabled"] = True
+        return form
+
     def get_queryset(self, request):
         # Fetch default queryset.
         qs = super().get_queryset(request)
