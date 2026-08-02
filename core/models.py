@@ -9,6 +9,7 @@ from django.contrib.auth.models import AbstractUser, Group
 import logging
 from django.utils import timezone
 from django.core.validators import MaxValueValidator, MinValueValidator
+from django.utils.formats import date_format
 
 logger = logging.getLogger(__name__)
 
@@ -102,3 +103,6 @@ class OysterLog(models.Model):
         help_text="Extra notes for this log (if desired)",
         blank=True, default=""
     )
+
+    def __str__(self):
+        return f"Log for {self.oyster} on {date_format(self.date, "F jS, Y")}"
