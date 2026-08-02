@@ -16,6 +16,11 @@ User = get_user_model()
 # Get logger
 logger = logging.Logger(__name__)
 
+# Change admin site titles
+admin.site.site_title = "Ostrea"
+admin.site.site_header = "Ostrea"
+admin.site.index_title = "Home"
+
 # CustomUserAdmin class
 @admin.register(User)
 class CustomUserAdmin(UserAdmin):
