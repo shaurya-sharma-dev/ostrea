@@ -8,7 +8,7 @@ from django.contrib import admin
 from django.contrib.auth import get_user_model
 from django.contrib.auth.admin import UserAdmin
 import logging
-from .models import Oyster
+from .models import Oyster, OysterLog
 
 # Register your models here.
 User = get_user_model()
@@ -70,6 +70,44 @@ class OysterAdmin(admin.ModelAdmin):
         qs = qs.filter(
             mentor__id=request.user.id
         ).distinct()
+
+        return qs
+
+    def delete_queryset(self, request, queryset):
+        # Intersect the submitted items with what the user is allowed to see
+        allowed_queryset = queryset & self.get_queryset(request)
+        
+        # Pass the filtered queryset to the default delete logic
+        super().delete_queryset(request, allowed_queryset)
+
+# Custom OysterLogAdmin class
+@admin.register(OysterLog)
+class OysterLogAdmin(admin.ModelAdmin):
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        if db_field.name == "oyster" and not request.user.is_superuser:
+            kwargs["queryset"] = Oyster.objects.filter(mentor=request.user)
+            
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
+    
+    def get_queryset(self, request):
+        # Fetch default queryset.
+        qs = super().get_queryset(request)
+        
+        # Superusers can view all logs.
+        if request.user.is_superuser:
+            return qs
+        
+        is_mentor = request.user.is_mentor
+
+        if not is_mentor:
+            # If the user is not a mentor, return an empty queryset.
+            # The user must have been given permissions incorrectly.
+            logger.warning("A user has view OysterLog permission without being a superuser or mentor. The system has not given them access to OysterLogs.")
+            return User.objects.none()
+        
+        qs = qs.filter(
+            oyster__mentor=request.user, # The mentor of the oyster must be the mentor currently logged in.
+        )
 
         return qs
 
