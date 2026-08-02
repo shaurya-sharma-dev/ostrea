@@ -1,6 +1,6 @@
 [project]
 name = "Ostrea"
-version = "0.1.0"
+dynamic = ["version"]
 description = "Ostrea is an educational website about oyster gardening."
 authors = [
     { name = "Shaurya Sharma" },
@@ -15,3 +15,10 @@ license-files = ["LICENSE*"]
 
 [tool.pdm]
 distribution = false
+
+[tool.pdm.version]
+source = "call"
+getter = "ostrea._version:_get_version_string"
+
+[tool.pdm.scripts]
+get-version = { call = "ostrea._version:_print_version_and_integrity" }
