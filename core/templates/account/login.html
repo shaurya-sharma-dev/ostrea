@@ -33,6 +33,10 @@ SOFTWARE.
     {% trans "Sign In" as heading %}
     {% #container heading=heading  %}
     {% if not SOCIALACCOUNT_ONLY %}
+        <div class="py-3">
+            If you are a teacher or student, you do not need an account.
+            Simply start using Ostrea by clicking <a class="text-blue-600 underline" href="/dashboard/">here</a>.
+        </div>
         {% url 'account_login' as action_url %}
         {% #form form=form url=action_url button_text=heading %}
         {% if form.remember %}

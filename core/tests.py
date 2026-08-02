@@ -12,7 +12,6 @@ from core.models import Oyster, OysterLog
 from django.contrib.admin.models import LogEntry
 from decimal import Decimal
 from django.contrib.admin.sites import AdminSite
-from .admin import CustomUserAdmin, GroupFilter
 from datetime import date
 
 # User model
@@ -24,22 +23,6 @@ def set_up_access_groups() -> dict[str, Group]:
     Group.objects.all().delete()
 
     # Add new groups
-
-    # Students Group
-    students = Group.objects.create(
-        name = "Access Group: Students"
-    )
-
-    # Teachers Group
-    user_content_type = ContentType.objects.get_for_model(User)
-    user_permissions = Permission.objects.filter(content_type=user_content_type)
-    user_view_permissions = user_permissions.filter(codename__startswith='view_')
-    
-    teachers = Group.objects.create(
-        name = "Access Group: Teachers",
-    )
-
-    teachers.permissions.set(user_view_permissions)
 
     # Mentors Group
     log_content_type = ContentType.objects.get_for_model(OysterLog)
@@ -56,8 +39,6 @@ def set_up_access_groups() -> dict[str, Group]:
     mentors.permissions.add(*log_permissions)
 
     return {
-        "students": students,
-        "teachers": teachers,
         "mentors": mentors,
     }
 
@@ -77,55 +58,6 @@ def set_up_test_data(password: str):
         email=None,
         password=password
     )
-
-    # Create two school groups
-    school1 = Group.objects.create(
-        name = "School: Test 1",
-    )
-
-    school2 = Group.objects.create(
-        name = "School: Test 2",
-    )
-
-    # Create two teachers with the corresponding school groups.
-    teacher1 = User.objects.create_user(
-        username="teacher1",
-        email=None,
-        password=password,
-        is_staff=True,
-    )
-
-    teacher1.groups.add(school1)
-    teacher1.groups.add(access_groups["teachers"])
-
-    teacher2 = User.objects.create_user(
-        username="teacher2",
-        email=None,
-        password=password,
-        is_staff=True,
-    )
-
-    teacher2.groups.add(school2)
-    teacher2.groups.add(access_groups["teachers"])
-
-    # Create two students with the corresponding school groups.
-    student1 = User.objects.create_user(
-        username="student1",
-        email=None,
-        password=password,
-    )
-
-    student1.groups.add(school1)
-    student1.groups.add(access_groups["students"])
-
-    student2 = User.objects.create_user(
-        username="student2",
-        email=None,
-        password=password,
-    )
-
-    student2.groups.add(school2)
-    student2.groups.add(access_groups["students"])
 
     # Create two mentors.
     mentor1 = User.objects.create_user(
@@ -188,46 +120,43 @@ def set_up_test_data(password: str):
 
     return {
         "access_groups": access_groups,
-        "schools": (school1, school2),
-        "teachers": (teacher1, teacher2),
-        "students": (student1, student2),
         "mentors": (mentor1, mentor2),
         "oysters": (oyster1, oyster2),
         "logs": ((log1_1, log1_2), (log2_1, log2_2)),
         "superuser": superuser
     }
 
-class TestCustomUserAdmin(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        cls.data = set_up_test_data("areallylongfillerpassword")
-        cls.factory = RequestFactory()
+# class TestCustomUserAdmin(TestCase):
+#     @classmethod
+#     def setUpTestData(cls):
+#         cls.data = set_up_test_data("areallylongfillerpassword")
+#         cls.factory = RequestFactory()
 
-    def setUp(self):
-        self.model_admin = CustomUserAdmin(User, AdminSite())
+#     def setUp(self):
+#         self.model_admin = CustomUserAdmin(User, AdminSite())
 
-    def test_teachers_can_only_see_their_students(self):
-        for index in range(2):
-            with self.subTest(index=index):
-                teacher = self.data["teachers"][index]
-                request = self.factory.get("")
-                request.user = teacher
+#     def test_teachers_can_only_see_their_students(self):
+#         for index in range(2):
+#             with self.subTest(index=index):
+#                 teacher = self.data["teachers"][index]
+#                 request = self.factory.get("")
+#                 request.user = teacher
 
-                qs = self.model_admin.get_queryset(request)
+#                 qs = self.model_admin.get_queryset(request)
 
-                self.assertIn(self.data["students"][index], qs)
-                self.assertIn(teacher, qs)
+#                 self.assertIn(self.data["students"][index], qs)
+#                 self.assertIn(teacher, qs)
 
-                self.assertNotIn(self.data["students"][(index + 1) % 2], qs)
-                self.assertNotIn(self.data["teachers"][(index + 1) % 2], qs)
+#                 self.assertNotIn(self.data["students"][(index + 1) % 2], qs)
+#                 self.assertNotIn(self.data["teachers"][(index + 1) % 2], qs)
 
-                # The queryset should have the teacher and student.
-                self.assertEqual(qs.count(), 2, "Queryset has more than two users.")
+#                 # The queryset should have the teacher and student.
+#                 self.assertEqual(qs.count(), 2, "Queryset has more than two users.")
 
-    def test_superuser_can_see_all_users(self):
-        request = self.factory.get("")
-        request.user = self.data["superuser"]
+#     def test_superuser_can_see_all_users(self):
+#         request = self.factory.get("")
+#         request.user = self.data["superuser"]
 
-        qs = self.model_admin.get_queryset(request)
+#         qs = self.model_admin.get_queryset(request)
 
-        self.assertEqual(qs.count(), User.objects.count(), "Superuser cannot see all users.")
+#         self.assertEqual(qs.count(), User.objects.count(), "Superuser cannot see all users.")
