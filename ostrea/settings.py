@@ -49,6 +49,9 @@ INSTALLED_APPS = [
     'widget_tweaks',
     'slippers',
 
+    # Django-ninja
+    'ninja',
+
     # Required built-in django features
     'django.contrib.admin',
     'django.contrib.auth',
