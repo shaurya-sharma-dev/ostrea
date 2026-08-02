@@ -10,6 +10,9 @@ import logging
 from django.utils import timezone
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.utils.formats import date_format
+import secrets
+from django.db.models.signals import pre_save
+from django.dispatch import receiver
 
 logger = logging.getLogger(__name__)
 
@@ -69,8 +72,27 @@ class Oyster(models.Model):
         blank=True, default=""
     )
 
+    @staticmethod
+    def generate_api_token():
+        return secrets.token_hex(32)
+    
+    token = models.CharField(
+        max_length=255,
+        unique=True,
+    )
+
     def __str__(self):
         return self.name
+
+@receiver(pre_save, sender=Oyster)
+def auto_generate_token(sender, instance, **kwargs):
+    if not instance.token:
+        # Loop to guarantee uniqueness if a collision ever somehow happens
+        while True:
+            new_token = Oyster.generate_api_token()
+            if not sender.objects.filter(token=new_token).exists():
+                instance.token = new_token
+                break
 
 class OysterLog(models.Model):
     class Meta:
