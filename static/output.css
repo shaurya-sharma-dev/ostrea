@@ -440,9 +440,6 @@
     rotate: 180deg;
   }
   @media (hover: hover) {
-    .hover\:cursor-pointer:hover {
-      cursor: pointer;
-    }
     .hover\:bg-gray-700:hover {
       background-color: var(--color-gray-700);
     }

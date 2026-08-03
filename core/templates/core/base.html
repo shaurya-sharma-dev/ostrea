@@ -19,7 +19,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/. -->
         <div class="container mx-auto pt-1">
         {% for message in messages %}
             <div role="alert"
-                    class="text-sm md:text-base alert alert-{{ message.tags }} w-11/12 md:w-9/12 lg:w-9/12 xl:w-9/12 mx-auto bg-gray-50 p-5 rounded-full">
+                    class="text-sm md:text-base alert alert-{{ message.tags }} w-11/12 md:w-9/12 lg:w-9/12 xl:w-9/12 mx-auto bg-gray-50 dark:bg-gray-900 dark:text-white p-5 rounded-full">
                 <span><strong>{{ message }}</strong></span>
             </div>
         {% endfor %}
