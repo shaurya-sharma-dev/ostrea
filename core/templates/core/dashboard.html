@@ -19,51 +19,69 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 {% block extrabody %}
 <script>
     const ctx = document.getElementById("testchart").getContext("2d");
-    const data = [
-        {% for oyster in logs %}
-        [   
-            "{{oyster.0}}",
-            {% for log in oyster|slice:"1:" %}
-            ["{{log.date}}", {{log.ph_level}},],
-            {% endfor %}
-        ],
-        {% endfor %}
-    ];
 
-    const datasets = data.map((series, index) => {
-        return {
-            label: `${series[0]}`,
-            data: series.slice(1, series.length).map(item => ({
-                x: item[0],
-                y: item[1],
-            })),
-            borderColor: 'rgb(75, 192, 192)',
-            tension: 0.2
-        };
-    });
+    async function fetchOysterData(url) {       
+        try {
+            const response = await fetch(url);
+            
+            if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            
+            const data = await response.json();
+            return data;
 
-    const myChart = new Chart(ctx, {
-        type: 'line',
-        data: {
-            datasets: datasets
-        },
-        options: {
-            responsive: true,
-            scales: {
-                x: {
-                    title: {
-                        display: true,
-                        text: 'Date'
-                    }
+        } catch (error) {
+            // Catch network issues or parsing failures
+            console.error("Fetch operation failed:", error.message);
+        }
+    }
+
+    function loadOysterGraph(token){
+        fetchOysterData("/api/oyster/get?token=" + token).then(oysterData => {
+            var data = [[oysterData.name]];
+            oysterData.oysterlog_set.forEach(element => {
+                data[0].push([element.date, parseFloat(element.ph_level)]);
+            });
+
+            const datasets = data.map((series, index) => {
+                return {
+                    label: `${series[0]}`,
+                    data: series.slice(1, series.length).map(item => ({
+                        x: item[0],
+                        y: item[1],
+                    })),
+                    borderColor: 'rgb(75, 192, 192)',
+                    tension: 0.2
+                };
+            });
+
+            const myChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    datasets: datasets
                 },
-                y: {
-                    title: {
-                        display: true,
-                        text: 'pH Level'
+                options: {
+                    responsive: true,
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Date'
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'pH Level'
+                            }
+                        }
                     }
                 }
-            }
-        }
-    });
+            });
+        });
+    }
+
+    loadOysterGraph("7813f80de329e42b2786072b9af460cb");
 </script>
 {% endblock extrabody %}
