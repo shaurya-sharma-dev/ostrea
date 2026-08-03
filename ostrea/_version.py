@@ -7,7 +7,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 import subprocess
 
 # Version info tuple in same format as sys.version_info.
-__version_info__ = (1, 0, 0, "beta", 1)
+__version_info__ = (1, 0, 0, "alpha", 1)
 
 # The below code defines a function called _get_version_string. 
 # The underscore is added to the beginning to signify that the function itself isn't part of the public API,
