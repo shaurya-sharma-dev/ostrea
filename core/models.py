@@ -74,7 +74,7 @@ class Oyster(models.Model):
 
     @staticmethod
     def generate_api_token():
-        return secrets.token_hex(32)
+        return secrets.token_hex(16)
     
     token = models.CharField(
         max_length=255,
