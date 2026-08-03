@@ -13,6 +13,7 @@ from django.contrib.admin.models import LogEntry
 from decimal import Decimal
 from django.contrib.admin.sites import AdminSite
 from datetime import date
+from .admin import OysterAdmin
 
 # User model
 User = get_user_model()
@@ -126,37 +127,35 @@ def set_up_test_data(password: str):
         "superuser": superuser
     }
 
-# class TestCustomUserAdmin(TestCase):
-#     @classmethod
-#     def setUpTestData(cls):
-#         cls.data = set_up_test_data("areallylongfillerpassword")
-#         cls.factory = RequestFactory()
+class TestOysterAdmin(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.data = set_up_test_data("password")
+        cls.factory = RequestFactory()
 
-#     def setUp(self):
-#         self.model_admin = CustomUserAdmin(User, AdminSite())
+    def setUp(self):
+        self.model_admin = OysterAdmin(Oyster, AdminSite())
 
-#     def test_teachers_can_only_see_their_students(self):
-#         for index in range(2):
-#             with self.subTest(index=index):
-#                 teacher = self.data["teachers"][index]
-#                 request = self.factory.get("")
-#                 request.user = teacher
+    def test_mentors_can_only_see_their_ousters(self):
+        for index in range(2):
+            with self.subTest(index=index):
+                mentor = self.data["mentors"][index]
+                request = self.factory.get("")
+                request.user = mentor
 
-#                 qs = self.model_admin.get_queryset(request)
+                qs = self.model_admin.get_queryset(request)
 
-#                 self.assertIn(self.data["students"][index], qs)
-#                 self.assertIn(teacher, qs)
+                self.assertIn(self.data["oysters"][index], qs)
 
-#                 self.assertNotIn(self.data["students"][(index + 1) % 2], qs)
-#                 self.assertNotIn(self.data["teachers"][(index + 1) % 2], qs)
+                self.assertNotIn(self.data["oysters"][(index + 1) % 2], qs)
 
-#                 # The queryset should have the teacher and student.
-#                 self.assertEqual(qs.count(), 2, "Queryset has more than two users.")
+                # The queryset should have just the oyster.
+                self.assertEqual(qs.count(), 1, "Queryset has more than one oyster.")
 
-#     def test_superuser_can_see_all_users(self):
-#         request = self.factory.get("")
-#         request.user = self.data["superuser"]
+    def test_superuser_can_see_all_oysters(self):
+        request = self.factory.get("")
+        request.user = self.data["superuser"]
 
-#         qs = self.model_admin.get_queryset(request)
+        qs = self.model_admin.get_queryset(request)
 
-#         self.assertEqual(qs.count(), User.objects.count(), "Superuser cannot see all users.")
+        self.assertEqual(qs.count(), Oyster.objects.count(), "Superuser cannot see all oysters.")
