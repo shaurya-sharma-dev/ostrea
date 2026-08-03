@@ -96,8 +96,8 @@ def auto_generate_token(sender, instance, **kwargs):
 
 class OysterLog(models.Model):
     class Meta:
-        verbose_name = "Oyster Log"
-        verbose_name_plural = "Oyster Logs"
+        verbose_name = "oyster log"
+        verbose_name_plural = "oyster logs"
 
     oyster = models.ForeignKey(
         to=Oyster, 
