@@ -5,7 +5,21 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 """
 
 from . import models
-from ninja import ModelSchema
+from ninja import ModelSchema, Schema, Field
+from enum import Enum
+
+class ErrorCodeEnum(str, Enum):
+    "Enum class for API errors."
+
+    OYSTER_NOT_FOUND = "OYSTER_NOT_FOUND"
+
+class ErrorResponse(Schema):
+    "Schema for error messages."
+
+    # The Enum automatically documents all allowed error codes in Swagger
+    code: ErrorCodeEnum = Field(..., description="The unique system error identifier.")
+
+    message: str = Field(..., description="Human-readable reason for the failure.")
 
 class OysterLogOut(ModelSchema):
     "Schema for OysterLog output."
