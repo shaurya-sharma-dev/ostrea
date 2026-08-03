@@ -130,7 +130,7 @@ def set_up_test_data(password: str):
 class TestOysterAdmin(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.data = set_up_test_data("password")
+        cls.data = set_up_test_data(" ")
         cls.factory = RequestFactory()
 
     def setUp(self):
