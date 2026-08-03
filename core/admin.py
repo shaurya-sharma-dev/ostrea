@@ -40,6 +40,7 @@ class OysterAdmin(admin.ModelAdmin):
 
     list_display = ("name", "site_name", "site_location", "deployment_date")
     search_fields = ("name", "site_name", "site_location")
+    readonly_fields = ("token",)
 
     def get_form(self, request, obj=None, change=False, **kwargs):
         form = super().get_form(request, obj, change, **kwargs)
