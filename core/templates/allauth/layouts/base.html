@@ -30,7 +30,7 @@ SOFTWARE.
 {% load static %}
 {% load allauth_ui %}
 <!DOCTYPE html>
-<html data-theme="{% allauth_ui_theme %}">
+<html>
     <head>
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -43,7 +43,7 @@ SOFTWARE.
         {% endblock extra_head %}
         {% include "core/meta.html" %}
     </head>
-    <body class="min-h-screen bg-base-300">
+    <body class="min-h-screen bg-base-300 bg-[url('/static/light_bg.jpg')] dark:bg-[url('/static/dark_bg.jpg')] dark:text-white">
         {% include "core/navbar.html" %}
         <div id="content">
         {% block body %}

@@ -12,7 +12,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/. -->
     {% block extrahead %}{% endblock extrahead %}
     {% include "core/meta.html" %}
 </head>
-<body>
+<body class="bg-[url('/static/light_bg.jpg')] dark:bg-[url('/static/dark_bg.jpg')]">
     {% include "core/navbar.html" %}
     <div id="content" class="container pt-1 mx-auto">
     {% if messages %}
@@ -25,7 +25,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/. -->
         {% endfor %}
         </div>
     {% endif %}
-    <div class="w-11/12 p-5 mx-auto mt-5 rounded-lg shadow-md md:w-9/12 lg:w-9/12 xl:w-9/12 bg-gray-50">
+    <div class="w-11/12 p-5 mx-auto mt-5 rounded-lg shadow-md md:w-9/12 lg:w-9/12 xl:w-9/12 bg-gray-50 dark:bg-gray-900 dark:text-white">
     {% block content %} {% endblock content %}
     </div>
     </div>
