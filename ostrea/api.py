@@ -6,6 +6,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 from ninja import NinjaAPI
 from . import __version__
+from core.endpoints import core_router
 
 api = NinjaAPI(
     title="Ostrea API", 
@@ -13,3 +14,5 @@ api = NinjaAPI(
     description="The API for the Ostrea web application.",
     urls_namespace="api",
 )
+
+api.add_router("/", core_router)
