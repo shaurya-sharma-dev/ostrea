@@ -71,7 +71,7 @@ class OysterAdmin(admin.ModelAdmin):
             # If it is not a mentor, return an empty queryset.
             # The user must have been given permissions incorrectly.
             logger.warning("A user has view oysters permission without being a superuser or mentor. The system has not given them access to oysters.")
-            return User.objects.none()
+            return Oyster.objects.none()
 
         qs = qs.filter(
             mentor__id=request.user.id
@@ -109,7 +109,7 @@ class OysterLogAdmin(admin.ModelAdmin):
             # If the user is not a mentor, return an empty queryset.
             # The user must have been given permissions incorrectly.
             logger.warning("A user has view OysterLog permission without being a superuser or mentor. The system has not given them access to OysterLogs.")
-            return User.objects.none()
+            return OysterLog.objects.none()
         
         qs = qs.filter(
             oyster__mentor=request.user, # The mentor of the oyster must be the mentor currently logged in.
