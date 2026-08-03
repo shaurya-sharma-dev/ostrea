@@ -136,7 +136,7 @@ class TestOysterAdmin(TestCase):
     def setUp(self):
         self.model_admin = OysterAdmin(Oyster, AdminSite())
 
-    def test_mentors_can_only_see_their_ousters(self):
+    def test_mentors_can_only_see_their_oysters(self):
         for index in range(2):
             with self.subTest(index=index):
                 mentor = self.data["mentors"][index]
