@@ -2,7 +2,8 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+const isDark = sessionStorage.getItem('theme') === 'dark' ||
+      (!('theme' in sessionStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches);
 
 if (isDark) {
     document.documentElement.dataset.theme = 'dark';
@@ -49,4 +50,5 @@ document.addEventListener('DOMContentLoaded', () => {
 const handleToggle = () => {
     document.documentElement.dataset.theme = document.documentElement.dataset.theme === 'light' ? 'dark' : 'light';
     handleIcon();
+    sessionStorage.setItem('theme', document.documentElement.dataset.theme);
 };
