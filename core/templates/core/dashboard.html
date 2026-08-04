@@ -13,13 +13,25 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 {% block content %} 
 <h1 class="text-4xl font-bold py-4">Dashboard</h1>
 <br>
-<canvas id="testchart"></canvas>
+<div id="dashboard"></div>
 {% endblock content %}
 
 {% block extrabody %}
 <script>
-    const ctx = document.getElementById("testchart").getContext("2d");
+    const dashboardDiv = document.getElementById("dashboard");
 
-    loadOysterGraph(ctx, "7813f80de329e42b2786072b9af460cb");
+    async function main() {
+        const db = await makeStandardDatabaseObject();
+        const user = await getUserObject(db);
+        if (user === null){
+            db.put("user", 1, {"name": "test"});
+        } else{
+            let canvas = document.createElement("canvas");
+            let ctx = canvas.getContext("2d");
+            dashboardDiv.appendChild(canvas);
+            loadOysterGraph(ctx, "7813f80de329e42b2786072b9af460cb");
+        }
+    }
+    main();
 </script>
 {% endblock extrabody %}

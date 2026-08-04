@@ -65,3 +65,92 @@ function loadOysterGraph(ctx, token){
         });
     });
 }
+
+// IndexedDB helper
+class Database {
+  constructor(dbName) {
+    this.dbName = dbName;
+    this.dbPromise = null;
+    this.storeName = 'store';
+    this.indexName = 'type_idx';
+  }
+
+  connect() {
+    if (this.dbPromise) return this.dbPromise;
+
+    this.dbPromise = new Promise((resolve, reject) => {
+      const request = indexedDB.open(this.dbName, 1);
+
+      request.onupgradeneeded = (e) => {
+        const db = e.target.result;
+        if (!db.objectStoreNames.contains(this.storeName)) {
+          const store = db.createObjectStore(this.storeName, { keyPath: 'id' });
+          store.createIndex(this.indexName, 'type', { unique: false });
+        }
+      };
+
+      request.onsuccess = (e) => resolve(e.target.result);
+      request.onerror = (e) => {
+        this.dbPromise = null;
+        reject(request.error);
+      };
+    });
+
+    return this.dbPromise;
+  }
+
+  async put(type, id, data) {
+    const db = await this.connect();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(this.storeName, 'readwrite');
+      const store = tx.objectStore(this.storeName);
+      const record = { ...data, id: `${type}_${id}`, type: type };
+      
+      const request = store.put(record);
+      request.onsuccess = () => resolve(request.result);
+      request.onerror = () => reject(request.error);
+    });
+  }
+
+  async get(type, id) {
+    const db = await this.connect();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(this.storeName, 'readonly');
+      const store = tx.objectStore(this.storeName);
+      
+      const request = store.get(`${type}_${id}`);
+      request.onsuccess = () => resolve(request.result || null);
+      request.onerror = () => reject(request.error);
+    });
+  }
+
+  async delete(type, id) {
+    const db = await this.connect();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(this.storeName, 'readwrite');
+      const store = tx.objectStore(this.storeName);
+
+      const request = store.delete(`${type}_${id}`);
+      request.onsuccess = () => resolve(true);
+      request.onerror = () => reject(request.error);
+    });
+  }
+}
+
+function makeStandardDatabaseObject(){
+    return new Database("OstreaStorage");
+}
+
+async function getUserObject(db){
+    try {
+        return await db.get('user', 1);
+    } catch (error) {
+        if (error.name === 'NotFoundError') {
+            console.warn("Caught Error: The 'user' object does not exist.");
+            return null;
+        } else {
+            console.error("DB Error:", error);
+            throw error;
+        }
+    }
+}
