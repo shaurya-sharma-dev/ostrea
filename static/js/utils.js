@@ -149,6 +149,26 @@ class Database {
       request.onerror = () => reject(request.error);
     });
   }
+
+  deleteDB(){
+    // Request the deletion of the database
+    const request = indexedDB.deleteDatabase(this.dbName);
+
+    // Successfully deleted
+    request.onsuccess = (event) => {
+        console.log("Database deleted successfully.");
+    };
+
+    // Error occurred during deletion
+    request.onerror = (event) => {
+        console.error("Error deleting database:", event.target.error);
+    };
+
+    // Blocked by open connections in other tabs/windows
+    request.onblocked = (event) => {
+        console.warn("Deletion blocked. Please close all other tabs using this database.");
+    };
+  }
 }
 
 function makeStandardDatabaseObject(){
