@@ -20,53 +20,6 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 <script>
     const ctx = document.getElementById("testchart").getContext("2d");
 
-    function loadOysterGraph(token){
-        fetchAPI("/api/oyster/get?token=" + token).then(oysterData => {
-            var data = [[oysterData.name]];
-            oysterData.oysterlog_set.forEach(element => {
-                data[0].push([element.date, parseFloat(element.ph_level)]);
-            });
-
-            const datasets = data.map((series, index) => {
-                return {
-                    label: `${series[0]}`,
-                    data: series.slice(1, series.length).map(item => ({
-                        x: item[0],
-                        y: item[1],
-                    })),
-                    borderColor: 'rgb(75, 192, 192)',
-                    tension: 0.2
-                };
-            });
-
-            const myChart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    datasets: datasets
-                },
-                options: {
-                    responsive: true,
-                    scales: {
-                        x: {
-                            title: {
-                                display: true,
-                                text: 'Date'
-                            }
-                        },
-                        y: {
-                            title: {
-                                display: true,
-                                text: 'pH Level'
-                            },
-                            min: 0,
-                            max: 14,
-                        }
-                    }
-                }
-            });
-        });
-    }
-
-    loadOysterGraph("7813f80de329e42b2786072b9af460cb");
+    loadOysterGraph(ctx, "7813f80de329e42b2786072b9af460cb");
 </script>
 {% endblock extrabody %}
