@@ -11,6 +11,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/. -->
     <title>{% block title %}Ostrea{% endblock title %}</title>
     {% block extrahead %}{% endblock extrahead %}
     {% include "core/meta.html" %}
+    <script src="{% static 'js/utils.js' %}"></script>
 </head>
 <body class="bg-[url('/static/light_bg.jpg')] dark:bg-[url('/static/dark_bg.jpg')]">
     {% include "core/navbar.html" %}
