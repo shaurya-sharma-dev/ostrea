@@ -9,10 +9,17 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 {% block content %} 
 <h1 class="text-4xl font-bold py-4">Welcome to Ostrea, an Open-Source Website for Oyster Gardening Education!</h1>
 {% if not request.user.is_authenticated %}
-<p>Are you a teacher or student? You don't need to sign up, just start using Ostrea by clicking <a class="text-blue-600 underline" href="/dashboard/">here</a>.</p>
+<p class="remove-for-non-staff">Are you a teacher or student? You don't need to sign up, just start using Ostrea by clicking <a class="text-blue-600 underline" href="/dashboard/">here</a>.</p>
 {% endif %}
 <h2 class="text-3xl font-bold py-4">Our Mission</h1>
 <p>
     Virginia's First Congressional District sits at the center of one the country's most significant aquaculture industries. 
 </p>
 {% endblock content %}
+
+{% block extrabody %}
+<script>
+    const db = makeStandardDatabaseObject();
+    db.connect();
+</script>
+{% endblock extrabody %}
