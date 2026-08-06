@@ -138,6 +138,20 @@ class Database {
     });
   }
 
+  async getAllOfType(type) {
+    const db = await this.connect();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(this.storeName, 'readonly');
+      const store = tx.objectStore(this.storeName);
+      const prefix = `${type}_`;
+      const range = IDBKeyRange.bound(prefix, prefix + '\uffff');
+      
+      const request = store.getAll(range);
+      request.onsuccess = () => resolve(request.result || null);
+      request.onerror = () => reject(request.error);
+    });
+  }
+
   async delete(type, id) {
     const db = await this.connect();
     return new Promise((resolve, reject) => {
