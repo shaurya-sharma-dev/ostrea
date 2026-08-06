@@ -21,6 +21,18 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
     const dashboardDiv = document.getElementById("dashboard");
     const db = makeStandardDatabaseObject();
 
+    async function showAddOysterPrompt(){
+        var token = prompt("Enter the token of the oyster here.\n\nWarning: You can only have one oyster at a time, meaning if you have an oyster right now, it will be overridden by this new oyster (if it exists)."); 
+        if (token !== null) {
+            let oysterData = await fetchAPI("/api/oyster/get?token=" + token); 
+            if (oysterData !== 404){
+                db.put("oyster", 1, {"token": token}); window.location.reload();
+            } else {
+                alert("Oyster not found.")
+            }
+        }
+    }
+
     async function main() {
         const user = await getUserObject(db);
         if (user === null){
@@ -40,10 +52,19 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
                 <button class="rounded-full bg-red-600 hover:bg-red-700 cursor-pointer py-2 px-2" onclick='if (confirm("Are you sure you want to wipe all of your local Ostrea data? If you proceed with this, the data CANNOT BE RECOVERED.")) {db.deleteDB(); window.location.reload();}'>Wipe Data</button>
             `)
             if (user.role === "student"){
-                let canvas = document.createElement("canvas");
-                let ctx = canvas.getContext("2d");
-                dashboardDiv.appendChild(canvas);
-                loadOysterGraph(ctx, "7813f80de329e42b2786072b9af460cb");
+                dashboardDiv.insertAdjacentHTML("beforeend", `
+                    <button class="rounded-full bg-blue-500 hover:bg-blue-700 cursor-pointer py-2 px-2" onclick='showAddOysterPrompt();'>Add Oyster</button>
+                `)
+                let oysters = await db.getAllOfType("oyster");
+                if (oysters.length == 0){
+                    dashboardDiv.insertAdjacentHTML("beforeend", "<p class='pt-4'>You don't have an oyster added yet to your dashboard. Try adding one to track its growth!</p>")
+                }
+                else {
+                    let canvas = document.createElement("canvas");
+                    let ctx = canvas.getContext("2d");
+                    dashboardDiv.appendChild(canvas);
+                    loadOysterGraph(ctx, oysters[0].token);
+                }
             } else if (user.role == "teacher"){
                 dashboardDiv.insertAdjacentHTML("beforeend", "<p>You are a teacher.</p>")
             }
