@@ -8,6 +8,7 @@ from . import schemas, models
 from ninja import Router
 
 oyster_router = Router(tags=["Oysters"])
+lessons_router = Router(tags=["Lessons"])
 
 @oyster_router.get("/get", response=
     {
@@ -24,5 +25,22 @@ def get_oyster(request, token: str):
             "code": schemas.ErrorCodeEnum.OYSTER_NOT_FOUND
         }
 
+@lessons_router.get("/get-all-units", response=
+    {
+        200: list[schemas.UnitOut],
+    }
+)
+def get_all_units(request):
+    return 200, models.Unit.objects.all()
+
+@lessons_router.get("/get-lessons-in-unit", response=
+    {
+        200: list[schemas.LessonOut],
+    }
+)
+def get_lessons_in_unit(request, unit_id: int):
+    return 200, models.Lesson.objects.filter(unit__id=unit_id)
+
 core_router = Router()
+core_router.add_router("/lessons", lessons_router)
 core_router.add_router("/oyster", oyster_router)
