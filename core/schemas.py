@@ -52,7 +52,6 @@ class QuestionOut(ModelSchema):
         fields = ["text", "correct_choice", "incorrect_choice_1", "incorrect_choice_2", "incorrect_choice_3"]
 
 class LessonOut(ModelSchema):
-    unit: UnitOut
     question_set: list[QuestionOut]
 
     class Meta:
