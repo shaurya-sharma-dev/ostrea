@@ -8,7 +8,7 @@ from django.contrib import admin
 from django.contrib.auth import get_user_model
 from django.contrib.auth.admin import UserAdmin
 import logging
-from .models import Oyster, OysterLog
+from .models import Oyster, OysterLog, Unit, Lesson, Question
 
 # Register your models here.
 User = get_user_model()
@@ -123,3 +123,5 @@ class OysterLogAdmin(admin.ModelAdmin):
         
         # Pass the filtered queryset to the default delete logic
         super().delete_queryset(request, allowed_queryset)
+
+admin.site.register([Unit, Lesson, Question])
