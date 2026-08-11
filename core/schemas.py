@@ -40,3 +40,25 @@ class OysterOut(ModelSchema):
     @staticmethod
     def resolve_oysterlog_set(oyster: models.Oyster):
         return list(oyster.oysterlog_set.all())
+
+class UnitOut(ModelSchema):
+    class Meta:
+        model = models.Unit
+        fields = ["pk", "name"]
+
+class QuestionOut(ModelSchema):
+    class Meta:
+        model = models.Question
+        fields = ["text", "correct_choice", "incorrect_choice_1", "incorrect_choice_2", "incorrect_choice_3"]
+
+class LessonOut(ModelSchema):
+    unit: UnitOut
+    question_set: list[QuestionOut]
+
+    class Meta:
+        model = models.Lesson
+        fields = ["name", "article"]
+
+    @staticmethod
+    def resolve_question_set(lesson: models.Lesson):
+        return list(lesson.question_set.all())
