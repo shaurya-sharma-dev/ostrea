@@ -128,3 +128,67 @@ class OysterLog(models.Model):
 
     def __str__(self):
         return f"Log for {self.oyster} on {date_format(self.date, "F jS, Y")}"
+
+class Unit(models.Model):
+    name = models.CharField(
+        max_length=250,
+        help_text="The name of the unit.",
+    )
+
+    def __str__(self):
+        return self.name
+
+class Lesson(models.Model):
+    name = models.CharField(
+        max_length=250,
+        help_text="The name of the lesson.",
+    )
+
+    article = models.TextField(
+        max_length=7500, # 1000-1250 words. Ideally should be shorter, but this limit gives some breathing room.
+        help_text="Article for the lesson formatted in Markdown.",
+    )
+
+    unit = models.ForeignKey(
+        help_text="The unit this lesson belongs to.",
+        to=Unit,
+        on_delete=models.CASCADE,
+    )
+
+    def __str__(self):
+        return self.name
+
+class Question(models.Model):
+    text = models.CharField(
+        max_length=250,
+        help_text="The text of the question.",
+    )
+
+    correct_choice = models.CharField(
+        max_length=250,
+        help_text="The text of the correct choice.",
+    )
+
+    incorrect_choice_1 = models.CharField(
+        max_length=250,
+        help_text="The text of the first incorrect choice.",
+    )
+
+    incorrect_choice_2 = models.CharField(
+        max_length=250,
+        help_text="The text of the second incorrect choice.",
+    )
+
+    incorrect_choice_3 = models.CharField(
+        max_length=250,
+        help_text="The text of the third incorrect choice.",
+    )
+
+    lesson = models.ForeignKey(
+        help_text="The lesson this question belongs to.",
+        to=Lesson,
+        on_delete=models.CASCADE,
+    )
+
+    def __str__(self):
+        return self.text
