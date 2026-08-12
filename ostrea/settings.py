@@ -33,8 +33,10 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('ENVIRONMENT') == "dev"
 
-ALLOWED_HOSTS = ["*"] if os.getenv('ENVIRONMENT') == "dev" else os.getenv('PROD_ALLOWED_HOSTS').split(',')
+ALLOWED_HOSTS = ["*"] if DEBUG else os.getenv('PROD_ALLOWED_HOSTS').split(',')
 
+if DEBUG:
+    SECURE_CROSS_ORIGIN_OPENER_POLICY = None
 
 # Application definition
 
