@@ -202,3 +202,37 @@ async function getUserObject(db){
         }
     }
 }
+
+function parseMarkdown(text) {
+    // Basic Markdown to HTML parser.
+    // Edge cases can break it, but since we control the input, it shouldn't
+    // be a major issue.
+
+    let html = text;
+
+    html = html.replace(/^### (.*$)/gim, '<h3 class="text-2xl font-bold py-4">$1</h3>');
+    html = html.replace(/^## (.*$)/gim, '<h2 class="text-3xl font-bold py-4">$1</h2>');
+    html = html.replace(/^# (.*$)/gim, '<h1 class="text-4xl font-bold py-4">$1</h1>');
+
+    html = html.replace(/\*\*(.*?)\*\*/g, '<strong class="font-bold">$1</strong>');
+
+    html = html.replace(/^\s*[-\*]\s+(.*$)/gim, '<li>$1</li>');
+
+    html = html.replace(/(<li>.*<\/li>)/gim, '<ul class="list-disc pl-5">$1</ul>');
+    html = html.replace(/<\/ul>\s*<ul class="list-disc pl-5">/g, ''); 
+
+    html = html.split('\n').map(line => {
+        line = line.trim();
+        if (!line) {
+            return ''
+        }; // Skip empty lines
+
+        if (line.match(/^<(h\d|ul|li)/)){
+            return line
+        };
+        
+        return `<p>${line}</p>`;
+    }).join('\n');
+
+    return html.trim();
+}
