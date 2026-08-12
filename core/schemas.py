@@ -56,7 +56,7 @@ class LessonOut(ModelSchema):
 
     class Meta:
         model = models.Lesson
-        fields = ["name", "article"]
+        fields = ["id", "name", "article"]
 
     @staticmethod
     def resolve_question_set(lesson: models.Lesson):
