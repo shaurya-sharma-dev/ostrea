@@ -1,0 +1,44 @@
+name: Update PDM Dependency Graph
+
+on:
+  push:
+    branches: [ "main", "master" ]
+    paths:
+      - "pdm.lock"
+      - "pyproject.toml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  sync-graph:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup PDM
+        uses: pdm-project/setup-pdm@v4
+        with:
+          python-version: "3.12"
+          cache: true
+
+      - name: Export PDM Lock to standard requirements
+        run: |
+          pdm export --format requirements --output requirements-dependency-graph.txt --without-hashes
+
+      - name: Commit exported requirements file
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          
+          # Only commit and push if the file actually changed
+          if [ -n "$(git status --porcelain requirements-dependency-graph.txt)" ]; then
+            git add requirements-dependency-graph.txt
+            git commit -m "chore: sync PDM transitive dependencies for GitHub Graph [skip ci]"
+            git push
+          else
+            echo "No dependency updates detected."
+          fi
