@@ -33,6 +33,11 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
         }
     }
 
+    async function toggleState() {
+        let btn = document.getElementById("state-toggle");
+        btn.innerText = btn.innerText === "Switch to Lessons" ? "Switch to Tracker" : "Switch to Lessons";
+    }
+
     async function main() {
         const user = await getUserObject(db);
         if (user === null){
@@ -54,6 +59,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
             if (user.role === "student"){
                 dashboardDiv.insertAdjacentHTML("beforeend", `
                     <button class="rounded-full bg-blue-500 hover:bg-blue-700 cursor-pointer py-2 px-2" onclick='showAddOysterPrompt();'>Add Oyster</button>
+                    <button class="rounded-full bg-blue-500 hover:bg-blue-700 cursor-pointer py-2 px-2" onclick='toggleState();' id='state-toggle'>Switch to Lessons</button>
                 `)
                 let oysters = await db.getAllOfType("oyster");
                 if (oysters.length == 0){
