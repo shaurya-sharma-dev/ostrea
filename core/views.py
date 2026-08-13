@@ -5,10 +5,40 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 """
 
 from django.shortcuts import render
+from django.views.decorators.csrf import csrf_exempt
+from django.conf import settings
+from functools import wraps
+
+def no_csrf(view_func):
+    """Marks a view as CSRF-exempt and deletes the CSRF token cookie from the user's browser.
+    The token is regenerated if they go back to a view without this decorator or the `csrf_exempt` decorator,
+    like the admin panel or allauth views.
+    
+    For security, this decorator CANNOT be applied on views that modify server-side data (like allauth or admin 
+    views). However, it can be applied on views like `index` or `dashboard` because those views do not interact 
+    with server-side data, and using `request.user` in templates for conditional navbar elements is perfectly 
+    safe."""
+
+    exempt_view = csrf_exempt(view_func)
+    
+    @wraps(view_func)
+    def _wrapped_view(request, *args, **kwargs):
+        response = exempt_view(request, *args, **kwargs)
+        
+        response.delete_cookie(
+            settings.CSRF_COOKIE_NAME,
+            path=settings.CSRF_COOKIE_PATH,
+            domain=settings.CSRF_COOKIE_DOMAIN,
+        )
+        return response
+        
+    return _wrapped_view
 
 # Create your views here.
+@no_csrf
 def index(request):
     return render(request, "core/index.html")
 
+@no_csrf
 def dashboard(request):
     return render(request, "core/dashboard.html")
