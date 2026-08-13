@@ -135,6 +135,12 @@ class Unit(models.Model):
         help_text="The name of the unit.",
     )
 
+    description = models.TextField(
+        max_length=500,
+        help_text="A short description of the unit.",
+        blank=True,
+    )
+
     def __str__(self):
         return self.name
 
