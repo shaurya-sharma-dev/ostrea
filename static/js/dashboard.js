@@ -35,7 +35,21 @@ async function toggleState() {
             loadOysterGraph(ctx, oysters[0].token);
         }
     } else {
-        subContainerDiv.insertAdjacentHTML("beforeend", "<p class='pt-4'>Lessons coming soon.</p>")
+        let units = await fetchAPI("/api/lessons/get-all-units");
+        if (units.length === 0){
+            subContainerDiv.insertAdjacentHTML("beforeend", "<p class='pt-4'>Lessons coming soon!</p>")
+        } else {
+            for (var i = 0; i < units.length; i ++){
+                let desc = units[i].description || "No description provided.";
+                let lessonCount = (await fetchAPI(`/api/lessons/get-lessons-in-unit?unit_id=${units[i].id}`)).length;
+                subContainerDiv.insertAdjacentHTML("beforeend", `<div class='py-2 px-2 rounded-sm border-solid border-gray-500 border'>
+                    <h2 class='text-2xl font-bold py-2'>${units[0].name}</h2>
+                    <p class='py-2'>Lesson Count: ${lessonCount}</p>
+                    <p class='py-2'>${desc}</p>
+                    </div>`
+                )
+            }
+        }
     }
 }
 
