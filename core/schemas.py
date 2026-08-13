@@ -44,7 +44,7 @@ class OysterOut(ModelSchema):
 class UnitOut(ModelSchema):
     class Meta:
         model = models.Unit
-        fields = ["id", "name"]
+        fields = ["id", "name", "description"]
 
 class QuestionOut(ModelSchema):
     class Meta:
