@@ -29,7 +29,7 @@ async function toggleState() {
     if (is_tracker){
         let oysters = await db.getAllOfType("oyster");
         if (oysters.length == 0){
-            subContainerDiv.insertAdjacentHTML("beforeend", "<p class='pt-4'>You don't have an oyster added yet to your dashboard. Try adding one to track its growth!</p>")
+            subContainerDiv.insertAdjacentHTML("beforeend", "<p>You don't have an oyster added yet to your dashboard. Try adding one to track its growth!</p>")
         }
         else {
             let canvas = document.createElement("canvas");
@@ -81,7 +81,7 @@ async function main() {
             `)
             toggleState();
         } else if (user.role == "teacher"){
-            subContainerDiv.insertAdjacentHTML("beforebegin", "<p class='pt-4'>You are a teacher.</p>")
+            subContainerDiv.insertAdjacentHTML("beforebegin", "<p>You are a teacher.</p>")
         }
     }
 }
