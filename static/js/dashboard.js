@@ -1,6 +1,9 @@
 const dashboardDiv = document.getElementById("dashboard");
 const db = makeStandardDatabaseObject();
+const buttonDiv = document.createElement("div");
+buttonDiv.classList.add("pb-4")
 const subContainerDiv = document.createElement("div");
+dashboardDiv.appendChild(buttonDiv)
 dashboardDiv.appendChild(subContainerDiv);
 
 async function showAddOysterPrompt(){
@@ -68,13 +71,13 @@ async function main() {
 </form>`);
         
     } else{
-        dashboardDiv.insertAdjacentHTML("beforebegin", `
-            <button class="rounded-full bg-red-600 hover:bg-red-700 cursor-pointer py-2 px-2" onclick='if (confirm("Are you sure you want to wipe all of your local Ostrea data? If you proceed with this, the data CANNOT BE RECOVERED.")) {db.deleteDB(); window.location.reload();}'>Wipe Data</button>
+        buttonDiv.insertAdjacentHTML("beforebegin", `
+            <button class="rounded-md bg-red-600 hover:bg-red-700 cursor-pointer py-2 px-2" onclick='if (confirm("Are you sure you want to wipe all of your local Ostrea data? If you proceed with this, the data CANNOT BE RECOVERED.")) {db.deleteDB(); window.location.reload();}'>Wipe Data</button>
         `)
         if (user.role === "student"){
-            dashboardDiv.insertAdjacentHTML("beforebegin", `
-                <button class="rounded-full bg-blue-500 hover:bg-blue-700 cursor-pointer py-2 px-2" onclick='showAddOysterPrompt();'>Add Oyster</button>
-                <button class="rounded-full bg-blue-500 hover:bg-blue-700 cursor-pointer py-2 px-2" onclick='toggleState();' id='state-toggle'>Switch to Tracker</button>
+            buttonDiv.insertAdjacentHTML("beforebegin", `
+                <button class="rounded-md bg-blue-500 hover:bg-blue-700 cursor-pointer py-2 px-2" onclick='showAddOysterPrompt();'>Add Oyster</button>
+                <button class="rounded-md bg-blue-500 hover:bg-blue-700 cursor-pointer py-2 px-2" onclick='toggleState();' id='state-toggle'>Switch to Tracker</button>
             `)
             toggleState();
         } else if (user.role == "teacher"){
