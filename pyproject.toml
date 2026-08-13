@@ -22,3 +22,4 @@ getter = "ostrea._version:_get_version_string"
 
 [tool.pdm.scripts]
 get-version = { call = "ostrea._version:_print_version_and_integrity" }
+test = "python manage.py test"
