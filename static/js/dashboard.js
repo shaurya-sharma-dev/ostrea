@@ -46,10 +46,11 @@ async function toggleState() {
                 let desc = units[i].description || "No description provided.";
                 let lessonCount = (await fetchAPI(`/api/lessons/get-lessons-in-unit?unit_id=${units[i].id}`)).length;
                 subContainerDiv.insertAdjacentHTML("beforeend", `<div class='py-2 px-2 rounded-sm border-solid border-gray-500 border'>
-                    <h2 class='text-2xl font-bold py-2'>${units[0].name}</h2>
+                    <h2 class='text-2xl font-bold py-2'>${units[i].name}</h2>
                     <p class='py-2'>Lesson Count: ${lessonCount}</p>
                     <p class='py-2'>${desc}</p>
-                    </div>`
+                    </div>
+                    <br>`
                 )
             }
         }
