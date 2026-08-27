@@ -138,6 +138,20 @@ class Database {
     });
   }
 
+  async getSafe(type, id) {
+    try {
+        return await db.get(type, id);
+    } catch (error) {
+        if (error.name === 'NotFoundError') {
+            console.warn("Caught Error: The requested object does not exist.");
+            return null;
+        } else {
+            console.error("DB Error:", error);
+            throw error;
+        }
+    }
+  }
+
   async getAllOfType(type) {
     const db = await this.connect();
     return new Promise((resolve, reject) => {
@@ -190,17 +204,7 @@ function makeStandardDatabaseObject(){
 }
 
 async function getUserObject(db){
-    try {
-        return await db.get('user', 1);
-    } catch (error) {
-        if (error.name === 'NotFoundError') {
-            console.warn("Caught Error: The 'user' object does not exist.");
-            return null;
-        } else {
-            console.error("DB Error:", error);
-            throw error;
-        }
-    }
+    return await db.getSafe('user', 1);
 }
 
 function parseMarkdown(text) {
