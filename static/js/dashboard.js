@@ -6,6 +6,10 @@ const subContainerDiv = document.createElement("div");
 dashboardDiv.appendChild(buttonDiv)
 dashboardDiv.appendChild(subContainerDiv);
 
+var pageState = {
+    "state": "init",
+};
+
 async function showAddOysterPrompt(){
     var token = prompt("Enter the token of the oyster here.\n\nWarning: You can only have one oyster at a time, meaning if you have an oyster right now, it will be overridden by this new oyster (if it exists)."); 
     if (token !== null) {
@@ -25,6 +29,10 @@ async function toggleState() {
     btn.innerText = btn.innerText === "Switch to Lessons" ? "Switch to Tracker" : "Switch to Lessons";
 
     let is_tracker = btn.innerText.includes("Lessons");
+
+    pageState = {
+        "state": is_tracker ? "studentTracker" : "studentLessonLanding",
+    }
 
     if (is_tracker){
         let oysters = await db.getAllOfType("oyster");
@@ -60,6 +68,10 @@ async function toggleState() {
 async function main() {
     const user = await getUserObject(db);
     if (user === null){
+        pageState = {
+            "state": "localCreation",
+        }
+
         dashboardDiv.insertAdjacentHTML("beforebegin", `<form id="profile-create-form">
     <h2 class="text-3xl font-bold py-4">Create Local Profile</h2>
     <p>This information will be stored on your device, and it is required in order to properly use Ostrea.</p>
