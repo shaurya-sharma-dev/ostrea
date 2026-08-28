@@ -97,11 +97,11 @@ async function main() {
         }
 
     } else{
-        buttonDiv.insertAdjacentHTML("beforebegin", `
+        buttonDiv.insertAdjacentHTML("afterbegin", `
             <button class="rounded-md bg-red-600 hover:bg-red-700 cursor-pointer py-2 px-2" onclick='if (confirm("Are you sure you want to wipe all of your local Ostrea data? If you proceed with this, the data CANNOT BE RECOVERED.")) {db.deleteDB(); window.location.reload();}'>Wipe Data</button>
         `)
         if (user.role === "student"){
-            buttonDiv.insertAdjacentHTML("beforebegin", `
+            buttonDiv.insertAdjacentHTML("afterbegin", `
                 <button class="rounded-md bg-blue-500 hover:bg-blue-700 cursor-pointer py-2 px-2" onclick='showAddOysterPrompt();'>Add Oyster</button>
                 <button class="rounded-md bg-blue-500 hover:bg-blue-700 cursor-pointer py-2 px-2" onclick='toggleStudentState();' id='state-toggle'></button>
             `)
