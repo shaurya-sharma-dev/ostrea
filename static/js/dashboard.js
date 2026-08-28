@@ -6,9 +6,7 @@ const subContainerDiv = document.createElement("div");
 dashboardDiv.appendChild(buttonDiv)
 dashboardDiv.appendChild(subContainerDiv);
 
-var pageState = {
-    "state": "init",
-};
+var pageState = null;
 
 async function showAddOysterPrompt(){
     var token = prompt("Enter the token of the oyster here.\n\nWarning: You can only have one oyster at a time, meaning if you have an oyster right now, it will be overridden by this new oyster (if it exists)."); 
@@ -22,20 +20,30 @@ async function showAddOysterPrompt(){
     }
 }
 
-async function toggleState() {
-    subContainerDiv.innerHTML = "";
-
-    let btn = document.getElementById("state-toggle");
-    btn.innerText = btn.innerText === "Switch to Lessons" ? "Switch to Tracker" : "Switch to Lessons";
-
-    let is_tracker = btn.innerText.includes("Lessons");
-
-    pageState = {
-        "state": is_tracker ? "studentTracker" : "studentLessonLanding",
+async function updatePage(){
+    if (pageState === null){
+        console.error("No page state selected.")
+        return;
     }
+    
+    let stateId = pageState.state;
 
-    if (is_tracker){
+    if (stateId === "localCreation"){
+        dashboardDiv.insertAdjacentHTML("beforebegin", `<form id="profile-create-form">
+            <h2 class="text-3xl font-bold py-4">Create Local Profile</h2>
+            <p>This information will be stored on your device, and it is required in order to properly use Ostrea.</p>
+            <p>Are you a teacher or student?</p>
+            <br>
+            <div class="grid grid-cols-2 gap-4 text-white">
+                <button class="rounded-full bg-blue-500 hover:bg-blue-700 cursor-pointer py-2" onclick='db.put("user", 1, {"joined": new Date(), "role": "student"});'>Student</button>
+                <button class="rounded-full bg-blue-500 hover:bg-blue-700 cursor-pointer py-2" onclick='db.put("user", 1, {"joined": new Date(), "role": "teacher"});'>Teacher</button>
+            </div>
+        </form>`);
+    } else if (stateId === "studentTracker"){
         let oysters = await db.getAllOfType("oyster");
+        let btn = document.getElementById("state-toggle");
+        btn.innerText = "Switch to Lessons";
+        subContainerDiv.innerHTML = "";
         if (oysters.length == 0){
             subContainerDiv.insertAdjacentHTML("beforeend", "<p>You don't have an oyster added yet to your dashboard. Try adding one to track its growth!</p>")
         }
@@ -45,8 +53,11 @@ async function toggleState() {
             subContainerDiv.appendChild(canvas);
             loadOysterGraph(ctx, oysters[0].token);
         }
-    } else {
+    } else if (stateId === "studentLessonLanding"){
         let units = await fetchAPI("/api/lessons/get-all-units");
+        let btn = document.getElementById("state-toggle");
+        btn.innerText = "Switch to Tracker";
+        subContainerDiv.innerHTML = "";
         if (units.length === 0){
             subContainerDiv.insertAdjacentHTML("beforeend", "<p class='pt-4'>Lessons coming soon!</p>")
         } else {
@@ -62,7 +73,20 @@ async function toggleState() {
                 )
             }
         }
+    } else if (stateId === "teacherLanding"){
+        subContainerDiv.innerHTML = "";
+        subContainerDiv.insertAdjacentHTML("beforebegin", "<p>You are a teacher.</p>");
+    } else {
+        console.error("Invalid page state ID:", stateId);
     }
+}
+
+async function toggleStudentState() {
+    pageState = {
+        "state": pageState.state === "studentLessonLanding" ? "studentTracker" : "studentLessonLanding",
+    };
+
+    updatePage();
 }
 
 async function main() {
@@ -72,17 +96,6 @@ async function main() {
             "state": "localCreation",
         }
 
-        dashboardDiv.insertAdjacentHTML("beforebegin", `<form id="profile-create-form">
-    <h2 class="text-3xl font-bold py-4">Create Local Profile</h2>
-    <p>This information will be stored on your device, and it is required in order to properly use Ostrea.</p>
-    <p>Are you a teacher or student?</p>
-    <br>
-    <div class="grid grid-cols-2 gap-4 text-white">
-        <button class="rounded-full bg-blue-500 hover:bg-blue-700 cursor-pointer py-2" onclick='db.put("user", 1, {"joined": new Date(), "role": "student"});'>Student</button>
-        <button class="rounded-full bg-blue-500 hover:bg-blue-700 cursor-pointer py-2" onclick='db.put("user", 1, {"joined": new Date(), "role": "teacher"});'>Teacher</button>
-    </div>
-</form>`);
-        
     } else{
         buttonDiv.insertAdjacentHTML("beforebegin", `
             <button class="rounded-md bg-red-600 hover:bg-red-700 cursor-pointer py-2 px-2" onclick='if (confirm("Are you sure you want to wipe all of your local Ostrea data? If you proceed with this, the data CANNOT BE RECOVERED.")) {db.deleteDB(); window.location.reload();}'>Wipe Data</button>
@@ -90,13 +103,20 @@ async function main() {
         if (user.role === "student"){
             buttonDiv.insertAdjacentHTML("beforebegin", `
                 <button class="rounded-md bg-blue-500 hover:bg-blue-700 cursor-pointer py-2 px-2" onclick='showAddOysterPrompt();'>Add Oyster</button>
-                <button class="rounded-md bg-blue-500 hover:bg-blue-700 cursor-pointer py-2 px-2" onclick='toggleState();' id='state-toggle'>Switch to Tracker</button>
+                <button class="rounded-md bg-blue-500 hover:bg-blue-700 cursor-pointer py-2 px-2" onclick='toggleStudentState();' id='state-toggle'></button>
             `)
-            toggleState();
+
+            pageState = {
+                "state": "studentTracker"
+            };
         } else if (user.role == "teacher"){
-            subContainerDiv.insertAdjacentHTML("beforebegin", "<p>You are a teacher.</p>")
+            pageState = {
+                "state": "teacherLanding"
+            };
         }
     }
+
+    updatePage();
 }
 
 db.connect().then(()=>{main()});
