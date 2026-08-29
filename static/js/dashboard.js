@@ -1,11 +1,19 @@
-const dashboardDiv = document.getElementById("dashboard");
+// Database object
 const db = makeStandardDatabaseObject();
+
+// Button div with bottom padding
 const buttonDiv = document.createElement("div");
 buttonDiv.classList.add("pb-4")
+
+// Div for actual page content
 const subContainerDiv = document.createElement("div");
+
+// Get dashboard div and add the new div elements to it.
+const dashboardDiv = document.getElementById("dashboard");
 dashboardDiv.appendChild(buttonDiv)
 dashboardDiv.appendChild(subContainerDiv);
 
+// pageState object
 var pageState = null;
 
 async function showAddOysterPrompt(){
@@ -13,7 +21,8 @@ async function showAddOysterPrompt(){
     if (token !== null) {
         let oysterData = await fetchAPI("/api/oyster/get?token=" + token); 
         if (oysterData !== 404){
-            db.put("oyster", 1, {"token": token}); window.location.reload();
+            db.put("oyster", 1, {"token": token}); 
+            window.location.reload();
         } else {
             alert("Oyster not found.")
         }
@@ -39,6 +48,7 @@ async function updatePage(){
                 <button class="rounded-full bg-blue-500 hover:bg-blue-700 cursor-pointer py-2" onclick='db.put("user", 1, {"joined": new Date(), "role": "teacher"});'>Teacher</button>
             </div>
         </form>`);
+
     } else if (stateId === "studentTracker"){
         let oysters = await db.getAllOfType("oyster");
         let btn = document.getElementById("state-toggle");
@@ -53,6 +63,7 @@ async function updatePage(){
             subContainerDiv.appendChild(canvas);
             loadOysterGraph(ctx, oysters[0].token);
         }
+
     } else if (stateId === "studentLessonLanding"){
         let units = await fetchAPI("/api/lessons/get-all-units");
         let btn = document.getElementById("state-toggle");
@@ -73,9 +84,11 @@ async function updatePage(){
                 )
             }
         }
+
     } else if (stateId === "teacherLanding"){
         subContainerDiv.innerHTML = "";
         subContainerDiv.insertAdjacentHTML("beforebegin", "<p>You are a teacher.</p>");
+
     } else {
         console.error("Invalid page state ID:", stateId);
     }
@@ -119,4 +132,6 @@ async function main() {
     updatePage();
 }
 
-db.connect().then(()=>{main()});
+db.connect().then(()=>{
+    main();
+});
