@@ -389,8 +389,8 @@
   .bg-red-600 {
     background-color: var(--color-red-600);
   }
-  .bg-\[url\(\'\/static\/light_bg\.jpg\'\)\] {
-    background-image: url('/static/light_bg.jpg');
+  .bg-\[url\(\'\/static\/img\/light-bg\.jpg\'\)\] {
+    background-image: url('/static/img/light-bg.jpg');
   }
   .p-1 {
     padding: var(--spacing);
@@ -554,8 +554,8 @@
   .dark\:bg-gray-900:where([data-theme="dark"], [data-theme="dark"] *) {
     background-color: var(--color-gray-900);
   }
-  .dark\:bg-\[url\(\'\/static\/dark_bg\.jpg\'\)\]:where([data-theme="dark"], [data-theme="dark"] *) {
-    background-image: url('/static/dark_bg.jpg');
+  .dark\:bg-\[url\(\'\/static\/img\/dark-bg\.jpg\'\)\]:where([data-theme="dark"], [data-theme="dark"] *) {
+    background-image: url('/static/img/dark-bg.jpg');
   }
   .dark\:text-white:where([data-theme="dark"], [data-theme="dark"] *) {
     color: var(--color-white);
