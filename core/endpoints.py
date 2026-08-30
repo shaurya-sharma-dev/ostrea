@@ -33,6 +33,21 @@ def get_oyster(request, token: str):
 def get_all_units(request):
     return 200, models.Unit.objects.all()
 
+@lessons_router.get("/get-unit", response=
+    {
+        200: schemas.UnitOut,
+        404: schemas.ErrorResponse,
+    }
+)
+def get_unit(request, unit_id: int):
+    try:
+        return 200, models.Unit.objects.get(id=unit_id)
+    except models.Unit.DoesNotExist:
+        return 404, {
+            "message": f"Unit with ID '{unit_id}' not found.", 
+            "code": schemas.ErrorCodeEnum.UNIT_NOT_FOUND
+        }
+
 @lessons_router.get("/get-lessons-in-unit", response=
     {
         200: list[schemas.LessonOut],

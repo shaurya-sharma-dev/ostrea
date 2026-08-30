@@ -12,6 +12,7 @@ class ErrorCodeEnum(str, Enum):
     "Enum class for API errors."
 
     OYSTER_NOT_FOUND = "OYSTER_NOT_FOUND"
+    UNIT_NOT_FOUND = "UNIT_NOT_FOUND"
 
 class ErrorResponse(Schema):
     "Schema for error messages."
