@@ -111,7 +111,7 @@ db.connect().then(async () => {
 
     } else{
         buttonDiv.insertAdjacentHTML("afterbegin", `
-            <button class="rounded-md bg-red-600 hover:bg-red-700 cursor-pointer py-2 px-2" onclick='if (confirm("Are you sure you want to wipe all of your local Ostrea data? If you proceed with this, the data CANNOT BE RECOVERED.")) {db.deleteDB(); window.location.reload();}'>Wipe Data</button>
+            <button class="rounded-md bg-red-600 hover:bg-red-700 cursor-pointer py-2 px-2" onclick='if (confirm("Are you sure you want to wipe all of your local Ostrea data? If you proceed with this, the data CANNOT BE RECOVERED.")) {db.deleteDB(); localStorage.clear(); window.location.reload();}'>Wipe Data</button>
         `)
         if (user.role === "student"){
             buttonDiv.insertAdjacentHTML("afterbegin", `
