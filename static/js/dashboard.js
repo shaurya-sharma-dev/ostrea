@@ -102,7 +102,7 @@ async function toggleStudentState() {
     updatePage();
 }
 
-async function main() {
+db.connect().then(async () => {
     const user = await getUserObject(db);
     if (user === null){
         pageState = {
@@ -130,8 +130,4 @@ async function main() {
     }
 
     updatePage();
-}
-
-db.connect().then(()=>{
-    main();
 });
