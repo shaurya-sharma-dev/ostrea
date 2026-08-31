@@ -65,23 +65,51 @@ async function updatePage(){
         }
 
     } else if (stateId === "studentLessonLanding"){
-        let units = await fetchAPI("/api/lessons/get-all-units");
         let btn = document.getElementById("state-toggle");
         btn.innerText = "Switch to Tracker";
         subContainerDiv.innerHTML = "";
-        if (units.length === 0){
-            subContainerDiv.insertAdjacentHTML("beforeend", "<p class='pt-4'>Lessons coming soon!</p>")
-        } else {
-            for (var i = 0; i < units.length; i ++){
-                let desc = units[i].description || "No description provided.";
-                let lessonCount = (await fetchAPI(`/api/lessons/get-lessons-in-unit?unit_id=${units[i].id}`)).length;
-                subContainerDiv.insertAdjacentHTML("beforeend", `<div class='py-2 px-2 rounded-sm border-solid border-gray-500 border'>
-                    <h2 class='text-2xl font-bold py-2'>${units[i].name}</h2>
-                    <p class='py-2'>Lesson Count: ${lessonCount}</p>
-                    <p class='py-2'>${desc}</p>
-                    </div>
-                    <br>`
-                )
+
+        if (pageState.display && pageState.display !== null){
+            let unit = await fetchAPI(`/api/lessons/get-unit?unit_id=${pageState.unitId}`);
+            subContainerDiv.insertAdjacentHTML("beforeend", `
+                <h2 class='text-3xl font-bold py-2'>${unit.name}</h2>
+                <p>${unit.description || "No description provided."}</p>
+                <button class="rounded-md bg-blue-500 hover:bg-blue-700 cursor-pointer py-2 px-2" onclick='pageState = {"state": "studentLessonLanding"}; updatePage();'>Back to All Units</button>
+            `)
+            let lessons = await fetchAPI(`/api/lessons/get-lessons-in-unit?unit_id=${pageState.unitId}`);
+
+            if (pageState.display == "unit"){
+                // Show all lessons in a unit.
+                for (var i = 0; i < lessons.length; i ++){
+                    subContainerDiv.insertAdjacentHTML("beforeend", `
+                        <h3 class='text-2xl font-bold py-2'>${lessons[i].name}</h3>
+                        <button class="rounded-md bg-blue-500 hover:bg-blue-700 cursor-pointer py-2 px-2" onclick='console.log("test");'>Start Lesson</button>
+                    `)
+                }
+
+            } else if (pageState.display == "lesson"){
+                // TODO: Add support to display a single lesson.
+            }
+
+        }
+
+        else {
+            let units = await fetchAPI("/api/lessons/get-all-units");
+            if (units.length === 0){
+                subContainerDiv.insertAdjacentHTML("beforeend", "<p class='pt-4'>Lessons coming soon!</p>")
+            } else {
+                for (var i = 0; i < units.length; i ++){
+                    let desc = units[i].description || "No description provided.";
+                    let lessonCount = (await fetchAPI(`/api/lessons/get-lessons-in-unit?unit_id=${units[i].id}`)).length;
+                    subContainerDiv.insertAdjacentHTML("beforeend", `<div class='py-2 px-2 rounded-sm border-solid border-gray-500 border'>
+                        <h2 class='text-2xl font-bold py-2'>${units[i].name}</h2>
+                        <p class='py-2'>Lesson Count: ${lessonCount}</p>
+                        <p class='py-2'>${desc}</p>
+                        <button class="rounded-md bg-blue-500 hover:bg-blue-700 cursor-pointer py-2 px-2" onclick='pageState = {"state": "studentLessonLanding", "display": "unit", "unitId": "${units[i].id}"}; updatePage();'>Open Unit</button>
+                        </div>
+                        <br>`
+                    )
+                }
             }
         }
 
