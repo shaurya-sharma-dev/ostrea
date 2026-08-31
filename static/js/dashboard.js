@@ -70,25 +70,31 @@ async function updatePage(){
         subContainerDiv.innerHTML = "";
 
         if (pageState.display && pageState.display !== null){
-            let unit = await fetchAPI(`/api/lessons/get-unit?unit_id=${pageState.unitId}`);
-            subContainerDiv.insertAdjacentHTML("beforeend", `
-                <h2 class='text-3xl font-bold py-2'>${unit.name}</h2>
-                <p>${unit.description || "No description provided."}</p>
-                <button class="rounded-md bg-blue-500 hover:bg-blue-700 cursor-pointer py-2 px-2" onclick='pageState = {"state": "studentLessonLanding"}; updatePage();'>Back to All Units</button>
-            `)
             let lessons = await fetchAPI(`/api/lessons/get-lessons-in-unit?unit_id=${pageState.unitId}`);
 
             if (pageState.display == "unit"){
                 // Show all lessons in a unit.
+                let unit = await fetchAPI(`/api/lessons/get-unit?unit_id=${pageState.unitId}`);
+                subContainerDiv.insertAdjacentHTML("beforeend", `
+                    <h2 class='text-3xl font-bold py-2'>${unit.name}</h2>
+                    <p>${unit.description || "No description provided."}</p>
+                    <button class="rounded-md bg-blue-500 hover:bg-blue-700 cursor-pointer py-2 px-2" onclick='pageState = {"state": "studentLessonLanding"}; updatePage();'>Back to All Units</button>
+                `)
                 for (var i = 0; i < lessons.length; i ++){
                     subContainerDiv.insertAdjacentHTML("beforeend", `
                         <h3 class='text-2xl font-bold py-2'>${lessons[i].name}</h3>
-                        <button class="rounded-md bg-blue-500 hover:bg-blue-700 cursor-pointer py-2 px-2" onclick='console.log("test");'>Start Lesson</button>
+                        <button class="rounded-md bg-blue-500 hover:bg-blue-700 cursor-pointer py-2 px-2" onclick='pageState = {"state": "studentLessonLanding", "display": "lesson", "unitId": "${unit.id}", "lessonId": ${lessons[i].id}}; updatePage();'>Start Lesson</button>
                     `)
                 }
 
             } else if (pageState.display == "lesson"){
-                // TODO: Add support to display a single lesson.
+                // Show one lesson.
+                let lesson = lessons.filter(l => l.id === pageState.lessonId)[0];
+                subContainerDiv.insertAdjacentHTML("beforeend", `
+                    <h1 class='text-4xl font-bold py-2'>${lesson.name}</h1>
+                    <button class="rounded-md bg-blue-500 hover:bg-blue-700 cursor-pointer py-2 px-2" onclick='pageState = {"state": "studentLessonLanding", "display": "unit", "unitId": "${pageState.unitId}"}; updatePage();'>Back to Unit</button>
+                    ${parseMarkdown(lesson.article)} 
+                `)
             }
 
         }
