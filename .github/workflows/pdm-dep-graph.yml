@@ -2,7 +2,7 @@ name: Update PDM Dependency Graph
 
 on:
   push:
-    branches: [ "main", "master" ]
+    branches: [ "main" ]
     paths:
       - "pdm.lock"
       - "pyproject.toml"
@@ -27,7 +27,7 @@ jobs:
 
       - name: Export PDM Lock to standard requirements
         run: |
-          pdm export --format requirements --output requirements-dependency-graph.txt --without-hashes
+          pdm export --format requirements --output requirements-transitive.txt --without-hashes
 
       - name: Commit exported requirements file
         run: |
@@ -35,8 +35,8 @@ jobs:
           git config --local user.name "github-actions[bot]"
           
           # Only commit and push if the file actually changed
-          if [ -n "$(git status --porcelain requirements-dependency-graph.txt)" ]; then
-            git add requirements-dependency-graph.txt
+          if [ -n "$(git status --porcelain requirements-transitive.txt)" ]; then
+            git add requirements-transitive.txt
             git commit -m "chore: sync PDM transitive dependencies for GitHub Graph [skip ci]"
             git push
           else
