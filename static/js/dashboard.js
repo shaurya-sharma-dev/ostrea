@@ -149,10 +149,14 @@ async function toggleStudentState() {
 db.connect().then(async () => {
     const user = await getUserObject(db);
     const urlParams = new URLSearchParams(window.location.search);
+    let pageId = urlParams.get("page");
 
     if (user === null){
+        if (pageId === null){
         // If no user has been created, ignore query params and go to local creation.
         window.location.replace("/dashboard?page=localCreation");
+        }
+        pageState = {"state": "localCreation"}
 
     } else{
         if (window.location.search === ""){
@@ -162,7 +166,6 @@ db.connect().then(async () => {
                 window.location.replace("/dashboard?page=teacherLanding");
             }
         } else {
-            let pageId = urlParams.get("page");
             if (pageId === "localCreation"){
                 window.location.replace("/dashboard");
             }
