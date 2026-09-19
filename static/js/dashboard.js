@@ -29,6 +29,78 @@ async function showAddOysterPrompt(){
     }
 }
 
+function submitCheck(){
+    let lesson = pageState.lessonObject;
+    let totalQuestions = lesson.question_set.length;
+    let correctQuestions = 0;
+    let allAnswered = true;
+    for (var i = 0; i < totalQuestions; i++){
+        let selectedAnswer = document.querySelector(`input[name="question${i}"]:checked`);
+        if (selectedAnswer !== null){
+            if (selectedAnswer.value == lesson.question_set[i].correct_choice){
+                correctQuestions ++;
+            }
+        } else {
+            allAnswered = false;
+            break;
+        }
+    }
+
+    if (allAnswered){
+        db.put("lessons", pageState.lessonId, {"correctQuestions": correctQuestions, "totalQuestions": totalQuestions});
+        window.location.reload();
+    } else {
+        alert("You have not answered all questions in this lesson.")
+    }
+}
+
+async function startCheck(){
+    let prevScore = await db.getSafe("lessons", pageState.lessonId);
+    if (prevScore !== null && prevScore.correctQuestions === prevScore.totalQuestions){
+        if (!confirm("Are you sure you want to start this lesson? You have already attained a score of 100%.\nPress OK to continue or Cancel to exit.")){
+            return;
+        }
+    }
+    let lesson = pageState.lessonObject;
+    let container = document.getElementById("check-container");
+    container.innerHTML = "";
+    let totalQuestions = lesson.question_set.length;
+    
+    for (var i = 0; i < totalQuestions; i++){
+        let answers = [
+            lesson.question_set[i].correct_choice,
+            lesson.question_set[i].incorrect_choice_1,
+            lesson.question_set[i].incorrect_choice_2,
+            lesson.question_set[i].incorrect_choice_3,
+        ];
+
+        // Shuffle answers list.
+        for (var j = answers.length - 1; j > 0; j--) {
+            const k = Math.floor(Math.random() * (j + 1));
+            [answers[j], answers[k]] = [answers[k], answers[j]];
+        }
+
+        for (var j = 0; j < answers.length; j++){
+            answer = answers[j];
+            answers[j] = `
+                <input type="radio" id="question${i}choice${j}" name="question${i}" value="${answer}" />
+                <label for="question${i}choice${j}">${answer}</label>
+            `;
+        }
+
+        container.insertAdjacentHTML("beforeend", `
+            <p class="font-bold py-2">${lesson.question_set[i].text}</p>
+            ${answers.join("<br>")}
+        `)
+    }
+
+    container.insertAdjacentHTML("beforeend", `
+        <br>
+        <br>
+        <button class="bg-blue-500 hover:bg-blue-700 cursor-pointer rounded-md py-2 px-2" onclick="submitCheck();">Submit Work</button>
+    `)
+}
+
 async function buildDOM(){
     if (pageState === null){
         console.error("No page state selected.")
@@ -90,10 +162,26 @@ async function buildDOM(){
             } else if (pageState.display == "lesson"){
                 // Show one lesson.
                 let lesson = lessons.filter(l => l.id === pageState.lessonId)[0];
+                pageState.lessonObject = lesson;
+                let prevScore = await db.getSafe("lessons", pageState.lessonId);
+                prevScore = prevScore === null ? "---" : `${(prevScore.correctQuestions / prevScore.totalQuestions) * 100}%`  
                 subContainerDiv.insertAdjacentHTML("beforeend", `
                     <h1 class='text-4xl font-bold py-2'>${lesson.name}</h1>
                     <button class="rounded-md bg-blue-500 hover:bg-blue-700 cursor-pointer py-2 px-2" onclick='pageState = {"state": "studentLessonLanding", "display": "unit", "unitId": "${pageState.unitId}"}; updatePage();'>Back to Unit</button>
                     ${parseMarkdown(lesson.article)} 
+                    ${lesson.question_set.length === 0 ? 
+                        '<p>This lesson is solely an article. Feel free to move on to the next one once you\'re finished.</p>': 
+                        `<h2 class="text-3xl font-bold py-2">Show What You Know!</h2>
+                        <p>Previous Score: ${prevScore}</p>
+                        <div id="check-container">
+                            <button 
+                                class="rounded-md bg-blue-500 hover:bg-blue-700 cursor-pointer py-2 px-2" 
+                                onclick=\'startCheck()\'
+                            >
+                            Start Check for Understanding
+                            </button>
+                        </div>`
+                    }
                 `)
             }
 
