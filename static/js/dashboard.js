@@ -29,7 +29,7 @@ async function showAddOysterPrompt(){
     }
 }
 
-async function updatePage(){
+async function buildDOM(){
     if (pageState === null){
         console.error("No page state selected.")
         return;
@@ -128,6 +128,16 @@ async function updatePage(){
     }
 }
 
+function updatePage(){
+    pageState.page = pageState.state;
+    delete pageState.state;
+    let href = `/dashboard?`;
+    for (const [key, value] of Object.entries(pageState)) {
+        href += `${key}=${value}&`;
+    }
+    window.location.href = href
+}
+
 async function toggleStudentState() {
     pageState = {
         "state": pageState.state === "studentLessonLanding" ? "studentTracker" : "studentLessonLanding",
@@ -138,30 +148,64 @@ async function toggleStudentState() {
 
 db.connect().then(async () => {
     const user = await getUserObject(db);
+    const urlParams = new URLSearchParams(window.location.search);
+
     if (user === null){
-        pageState = {
-            "state": "localCreation",
-        }
+        // If no user has been created, ignore query params and go to local creation.
+        window.location.replace("/dashboard?page=localCreation");
 
     } else{
-        buttonDiv.insertAdjacentHTML("afterbegin", `
-            <button class="rounded-md bg-red-600 hover:bg-red-700 cursor-pointer py-2 px-2" onclick='if (confirm("Are you sure you want to wipe all of your local Ostrea data? If you proceed with this, the data CANNOT BE RECOVERED.")) {db.deleteDB(); localStorage.clear(); window.location.reload();}'>Wipe Data</button>
-        `)
-        if (user.role === "student"){
-            buttonDiv.insertAdjacentHTML("afterbegin", `
-                <button class="rounded-md bg-blue-500 hover:bg-blue-700 cursor-pointer py-2 px-2" onclick='showAddOysterPrompt();'>Add Oyster</button>
-                <button class="rounded-md bg-blue-500 hover:bg-blue-700 cursor-pointer py-2 px-2" onclick='toggleStudentState();' id='state-toggle'></button>
-            `)
+        if (window.location.search === ""){
+            if (user.role === "student"){
+                window.location.replace("/dashboard?page=studentTracker");
+            } else if (user.role == "teacher"){
+                window.location.replace("/dashboard?page=teacherLanding");
+            }
+        } else {
+            let pageId = urlParams.get("page");
+            if (pageId === "localCreation"){
+                window.location.replace("/dashboard");
+            }
+            if (user.role === "student" && (pageId.includes("teacher") || pageId === null)){
+                window.location.replace("/dashboard?page=studentTracker");
+            } else if (user.role === "teacher" && (pageId.includes("student") || pageId === null)){
+                window.location.replace("/dashboard?page=teacherLanding");
+            } else {
+                const VALID_PAGES = ["studentTracker", "studentLessonLanding", "teacherLanding"];
+                if (VALID_PAGES.includes(pageId)){
+                    buttonDiv.insertAdjacentHTML("afterbegin", `
+                        <button class="rounded-md bg-red-600 hover:bg-red-700 cursor-pointer py-2 px-2" onclick='if (confirm("Are you sure you want to wipe all of your local Ostrea data? If you proceed with this, the data CANNOT BE RECOVERED.")) {db.deleteDB(); localStorage.clear(); window.location.reload();}'>Wipe Data</button>
+                    `)
+                    if (user.role === "student"){
+                        buttonDiv.insertAdjacentHTML("afterbegin", `
+                            <button class="rounded-md bg-blue-500 hover:bg-blue-700 cursor-pointer py-2 px-2" onclick='showAddOysterPrompt();'>Add Oyster</button>
+                            <button class="rounded-md bg-blue-500 hover:bg-blue-700 cursor-pointer py-2 px-2" onclick='toggleStudentState();' id='state-toggle'></button>
+                        `)
+                    }
 
-            pageState = {
-                "state": "studentTracker"
-            };
-        } else if (user.role == "teacher"){
-            pageState = {
-                "state": "teacherLanding"
-            };
+                    pageState = {
+                        "state": pageId
+                    };
+                    urlParams.forEach((value, key) => {
+                        if (key === "page"){
+                            return;
+                        } else {
+                            if (key == "lessonId"){
+                                pageState[key] = Number(value);
+                                if (pageState[key] === NaN){
+                                    window.location.replace("/dashboard");
+                                }
+                                return;
+                            }
+                            pageState[key] = value;
+                        }
+                    });
+                } else {
+                    window.location.replace("/dashboard");
+                }
+            }
         }
     }
 
-    updatePage();
+    buildDOM();
 });
