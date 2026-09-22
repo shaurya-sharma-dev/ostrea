@@ -42,3 +42,7 @@ def index(request):
 @no_csrf
 def dashboard(request):
     return render(request, "core/dashboard.html")
+
+@no_csrf
+def oyster_anatomy_memory_game(request):
+    return render(request, "core/games/oyster_anatomy_memory_game.html")
