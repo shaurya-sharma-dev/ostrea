@@ -8,6 +8,7 @@ from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
 from functools import wraps
+from django.views.decorators.clickjacking import xframe_options_sameorigin
 
 def no_csrf(view_func):
     """Marks a view as CSRF-exempt and deletes the CSRF token cookie from the user's browser.
@@ -44,5 +45,6 @@ def dashboard(request):
     return render(request, "core/dashboard.html")
 
 @no_csrf
+@xframe_options_sameorigin
 def oyster_anatomy_memory_game(request):
     return render(request, "core/games/oyster_anatomy_memory_game.html")
