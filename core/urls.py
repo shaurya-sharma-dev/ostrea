@@ -8,6 +8,7 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
+    path('games/oyster-anatomy/', views.oyster_anatomy_memory_game, name="oyster_anatomy_memory_game"),
     path('dashboard/', views.dashboard, name="dashboard"),
     path('', views.index, name="home"),
 ]
