@@ -101,6 +101,10 @@ async function startCheck(){
     `)
 }
 
+const ARTICLE_KEYWORDS = {
+    "GAME:OYSTER_ANATOMY_MEMORY": `<iframe src="/games/oyster-anatomy/" title="Oyster Anatomy Memory Game" class="w-full max-w-5xl min-h-[85vh]"></iframe>`,
+}
+
 async function buildDOM(){
     if (pageState === null){
         console.error("No page state selected.")
@@ -164,11 +168,15 @@ async function buildDOM(){
                 let lesson = lessons.filter(l => l.id === pageState.lessonId)[0];
                 pageState.lessonObject = lesson;
                 let prevScore = await db.getSafe("lessons", pageState.lessonId);
-                prevScore = prevScore === null ? "---" : `${(prevScore.correctQuestions / prevScore.totalQuestions) * 100}%`  
+                prevScore = prevScore === null ? "---" : `${(prevScore.correctQuestions / prevScore.totalQuestions) * 100}%`;
+                let parsed = parseMarkdown(lesson.article);
+                let finalArticle = Object.entries(ARTICLE_KEYWORDS).reduce((str, [key, value]) => {
+                    return str.replaceAll(key, value);
+                }, parsed);
                 subContainerDiv.insertAdjacentHTML("beforeend", `
                     <h1 class='text-4xl font-bold py-2'>${lesson.name}</h1>
                     <button class="rounded-md bg-blue-500 hover:bg-blue-700 cursor-pointer py-2 px-2" onclick='pageState = {"state": "studentLessonLanding", "display": "unit", "unitId": "${pageState.unitId}"}; updatePage();'>Back to Unit</button>
-                    ${parseMarkdown(lesson.article)} 
+                    ${finalArticle} 
                     ${lesson.question_set.length === 0 ? 
                         '<p>This lesson is solely an article. Feel free to move on to the next one once you\'re finished.</p>': 
                         `<h2 class="text-3xl font-bold py-2">Show What You Know!</h2>
