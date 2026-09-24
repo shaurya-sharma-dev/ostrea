@@ -380,6 +380,9 @@
   .w-11\/12 {
     width: calc(11 / 12 * 100%);
   }
+  .w-20\/24 {
+    width: calc(20 / 24 * 100%);
+  }
   .w-48 {
     width: calc(var(--spacing) * 48);
   }
@@ -1118,6 +1121,9 @@
     .md\:w-9\/12 {
       width: calc(9 / 12 * 100%);
     }
+    .md\:w-20\/24 {
+      width: calc(20 / 24 * 100%);
+    }
     .md\:text-base {
       font-size: var(--text-base);
       line-height: var(--tw-leading, var(--text-base--line-height));
@@ -1126,6 +1132,9 @@
   @media (width >= 64rem) {
     .lg\:w-9\/12 {
       width: calc(9 / 12 * 100%);
+    }
+    .lg\:w-20\/24 {
+      width: calc(20 / 24 * 100%);
     }
     .lg\:w-80 {
       width: calc(var(--spacing) * 80);
@@ -1137,6 +1146,9 @@
   @media (width >= 80rem) {
     .xl\:w-9\/12 {
       width: calc(9 / 12 * 100%);
+    }
+    .xl\:w-20\/24 {
+      width: calc(20 / 24 * 100%);
     }
   }
   .dark\:bg-gray-900:where([data-theme="dark"], [data-theme="dark"] *) {
