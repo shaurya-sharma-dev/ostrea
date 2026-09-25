@@ -57,7 +57,7 @@ function submitCheck(){
 async function startCheck(){
     let prevScore = await db.getSafe("lessons", pageState.lessonId);
     if (prevScore !== null && prevScore.correctQuestions === prevScore.totalQuestions){
-        if (!confirm("Are you sure you want to start this lesson? You have already attained a score of 100%.\nPress OK to continue or Cancel to exit.")){
+        if (!confirm("Are you sure you want to start this lesson? You have already attained a score of 100%.\n\nPress OK to continue or Cancel to exit.")){
             return;
         }
     }
@@ -178,7 +178,7 @@ async function buildDOM(){
                     <button class="rounded-md bg-blue-500 hover:bg-blue-700 cursor-pointer py-2 px-2" onclick='pageState = {"state": "studentLessonLanding", "display": "unit", "unitId": "${pageState.unitId}"}; updatePage();'>Back to Unit</button>
                     ${finalArticle} 
                     ${lesson.question_set.length === 0 ? 
-                        '<p>This lesson is solely an article. Feel free to move on to the next one once you\'re finished.</p>': 
+                        '<p class="py-4">You have finished this article. Feel free to move on to the next one once you\'re ready!</p>': 
                         `<h2 class="text-3xl font-bold py-2">Show What You Know!</h2>
                         <p>Previous Score: ${prevScore}</p>
                         <div id="check-container">
