@@ -217,7 +217,13 @@ async function buildDOM(){
 
     } else if (stateId === "teacherLanding"){
         subContainerDiv.innerHTML = "";
-        subContainerDiv.insertAdjacentHTML("beforebegin", "<p>You are a teacher.</p>");
+        subContainerDiv.insertAdjacentHTML("beforebegin", `<h2 class="text-3xl font-bold py-2">Welcome, teacher!</h2>
+        <p>How will you use Ostrea today?</p>
+        <div class="grid grid-cols-3 gap-4 text-white py-4">
+            <button class="rounded-full bg-blue-500 hover:bg-blue-700 cursor-pointer py-2" onclick='console.log("add student");'>Add Student</button>
+            <button class="rounded-full bg-blue-500 hover:bg-blue-700 cursor-pointer py-2" onclick='console.log("request sync");'>Request Sync</button>
+            <button class="rounded-full bg-blue-500 hover:bg-blue-700 cursor-pointer py-2" onclick='console.log("view data");'>View Student Data</button>
+        </div>`);
 
     } else {
         console.error("Invalid page state ID:", stateId);
