@@ -97,25 +97,37 @@ def set_up_test_data(password: str):
     # Create two logs for each oyster.
     log1_1 = OysterLog.objects.create(
         oyster=oyster1,
-        ph_level=Decimal("6.5"),
+        salinity=Decimal("14.3"),
+        temperature=Decimal("79.6"),
+        shell_diameter=Decimal("2.13"),
+        weight=Decimal("43.7"),
         date=date(2026, 1, 1),
     )
 
     log1_2 = OysterLog.objects.create(
         oyster=oyster1,
-        ph_level=Decimal("7.3"),
+        salinity=Decimal("9.3"),
+        temperature=Decimal("68.2"),
+        shell_diameter=Decimal("3.4"),
+        weight=Decimal("65.3"),
         date=date(2026, 1, 8),
     )
 
     log2_1 = OysterLog.objects.create(
         oyster=oyster2,
-        ph_level=Decimal("5.2"),
+        salinity=Decimal("9.6"),
+        temperature=Decimal("87.9"),
+        shell_diameter=Decimal("1.12"),
+        weight=Decimal("23.6"),
         date=date(2026, 1, 1),
     )
 
     log2_2 = OysterLog.objects.create(
         oyster=oyster2,
-        ph_level=Decimal("9.3"),
+        salinity=Decimal("7.4"),
+        temperature=Decimal("59.3"),
+        shell_diameter=Decimal("2.94"),
+        weight=Decimal("76.3"),
         date=date(2026, 1, 8),
     )
 
