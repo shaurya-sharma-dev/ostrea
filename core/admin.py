@@ -89,6 +89,8 @@ class OysterAdmin(admin.ModelAdmin):
 # Custom OysterLogAdmin class
 @admin.register(OysterLog)
 class OysterLogAdmin(admin.ModelAdmin):
+    list_display = ("oyster", "date", "salinity", "temperature", "shell_diameter", "weight")
+
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
         if db_field.name == "oyster" and not request.user.is_superuser:
             kwargs["queryset"] = Oyster.objects.filter(mentor=request.user)
