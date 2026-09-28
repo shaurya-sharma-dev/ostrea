@@ -41,6 +41,10 @@ if DEBUG:
 # Application definition
 
 INSTALLED_APPS = [
+    # Daphne + Channels
+    'daphne',
+    'channels',
+
     # Custom logic
     'core',
 
@@ -91,8 +95,13 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'ostrea.wsgi.application'
+ASGI_APPLICATION = 'ostrea.asgi.application'
 
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer",
+    },
+}
 
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
