@@ -27,7 +27,7 @@ class OysterLogOut(ModelSchema):
 
     class Meta:
         model = models.OysterLog
-        fields = ["date", "ph_level", "field_logs"]
+        fields = ["date", "salinity", "temperature", "shell_diameter", "weight", "field_logs"]
 
 class OysterOut(ModelSchema):
     "Schema for Oyster output to use when the API is outputting an Oyster's data."

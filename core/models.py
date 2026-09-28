@@ -8,7 +8,6 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser, Group
 import logging
 from django.utils import timezone
-from django.core.validators import MaxValueValidator, MinValueValidator
 from django.utils.formats import date_format
 import secrets
 from django.db.models.signals import pre_save
@@ -110,14 +109,28 @@ class OysterLog(models.Model):
         help_text="The date of the log."
     )
 
-    ph_level = models.DecimalField(
+    salinity = models.DecimalField(
         max_digits=4,
         decimal_places=2,
-        validators=[
-            MinValueValidator(0.0),
-            MaxValueValidator(14.0)
-        ],
-        help_text="The pH level of the water (0.00 - 14.00)"
+        help_text="The salinity level of the water, measured in PPT."
+    )
+
+    temperature = models.DecimalField(
+        max_digits=4,
+        decimal_places=2,
+        help_text="The temperature of the water, measured in fahrenheit."
+    )
+
+    shell_diameter = models.DecimalField(
+        max_digits=4,
+        decimal_places=2,
+        help_text="The diameter of the shell, measured in inches."
+    )
+
+    weight = models.DecimalField(
+        max_digits=4,
+        decimal_places=2,
+        help_text="The weight of the oyster, measured in grams."
     )
 
     field_logs = models.TextField(
