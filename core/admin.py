@@ -126,4 +126,9 @@ class OysterLogAdmin(admin.ModelAdmin):
         # Pass the filtered queryset to the default delete logic
         super().delete_queryset(request, allowed_queryset)
 
-admin.site.register([Unit, Lesson, Question])
+@admin.register(Lesson)
+class LessonAdmin(admin.ModelAdmin):
+    list_display = ("name", "unit")
+    list_filter = ("unit",)
+
+admin.site.register([Unit, Question])
