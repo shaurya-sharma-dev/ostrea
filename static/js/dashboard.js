@@ -225,7 +225,7 @@ async function buildDOM(){
                     <button class="rounded-md bg-blue-500 hover:bg-blue-700 cursor-pointer py-2 px-2" onclick='pageState = {"state": "studentLessonLanding", "display": "unit", "unitId": "${pageState.unitId}"}; updatePage();'>Back to Unit</button>
                     ${finalArticle} 
                     ${lesson.question_set.length === 0 ? 
-                        '<p class="py-4">You have finished this article. Feel free to move on to the next one once you\'re ready!</p>': 
+                        '<p class="py-4">You have finished this lesson. Feel free to move on to the next one once you\'re ready!</p>': 
                         `<h2 class="text-3xl font-bold py-2">Show What You Know!</h2>
                         <p>Previous Score: ${prevScore}</p>
                         <div id="check-container">
