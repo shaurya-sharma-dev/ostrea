@@ -147,7 +147,6 @@ async function startCheck(){
 }
 
 const ARTICLE_KEYWORDS = {
-    "GAME:OYSTER_ANATOMY_MEMORY": `<iframe src="/games/oyster-anatomy/" title="Oyster Anatomy Memory Game" class="w-full max-w-5xl min-h-[85vh]"></iframe>`,
     "INTERACTIVE:OYSTER_ANATOMY_FLASHCARDS": `<iframe src="https://docs.google.com/presentation/d/e/2PACX-1vQWy9V23B4DXxJmpX5OCnaPfYOWz4hkJ49jFsOb5gq1sXnFQWnCO4cVt0Qhk1NBhu8xjMPN2tzG3IK1/pubembed?start=false&loop=false&delayms=3000" frameborder="0" width="480" height="299" allowfullscreen="true" mozallowfullscreen="true" webkitallowfullscreen="true"></iframe>`,
 }
 
