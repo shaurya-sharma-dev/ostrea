@@ -29,11 +29,11 @@ async function showAddOysterPrompt(){
     }
 }
 
-function loadOysterGraph(ctx, token){
+function loadOysterGraph(ctx, token, attribute, yAxisLabel){
     fetchAPI("/api/oyster/get?token=" + token).then(oysterData => {
         var data = [[oysterData.name]];
         oysterData.oysterlog_set.forEach(element => {
-            data[0].push([element.date, parseFloat(element.ph_level)]);
+            data[0].push([element.date, parseFloat(element[attribute])]);
         });
 
         const datasets = data.map((series, index) => {
@@ -48,7 +48,7 @@ function loadOysterGraph(ctx, token){
             };
         });
 
-        const myChart = new Chart(ctx, {
+        new Chart(ctx, {
             type: 'line',
             data: {
                 datasets: datasets
@@ -65,10 +65,8 @@ function loadOysterGraph(ctx, token){
                     y: {
                         title: {
                             display: true,
-                            text: 'pH Level'
+                            text: yAxisLabel
                         },
-                        min: 0,
-                        max: 14,
                     }
                 }
             }
@@ -183,8 +181,9 @@ async function buildDOM(){
         else {
             let canvas = document.createElement("canvas");
             let ctx = canvas.getContext("2d");
+            subContainerDiv.insertAdjacentHTML("beforeend", "<p>Track your oyster with the graphs below! All dates are formatted as YYYY-MM-DD.</p>");
             subContainerDiv.appendChild(canvas);
-            loadOysterGraph(ctx, oysters[0].token);
+            loadOysterGraph(ctx, oysters[0].token, "salinity", "Salinity (PPT)");
         }
 
     } else if (stateId === "studentLessonLanding"){
