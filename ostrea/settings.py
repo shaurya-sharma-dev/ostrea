@@ -41,10 +41,6 @@ if DEBUG:
 # Application definition
 
 INSTALLED_APPS = [
-    # Daphne + Channels
-    'daphne',
-    'channels',
-
     # Custom logic
     'core',
 
@@ -95,7 +91,7 @@ TEMPLATES = [
     },
 ]
 
-ASGI_APPLICATION = 'ostrea.asgi.application'
+WSGI_APPLICATION = 'ostrea.wsgi.application'
 
 CHANNEL_LAYERS = {
     "default": {
