@@ -6,7 +6,7 @@ authors = [
     { name = "Shaurya Sharma" },
     { name = "Shreya Sharma" }
 ]
-dependencies = ["Django==6.0.7", "django-allauth==65.18.0", "django-allauth-ui==1.8.1", "django-widget-tweaks==1.5.1", "slippers==0.6.3", "python-dotenv==1.2.2", "django-ninja==1.6.2", "pydantic==2.13.4"]
+dependencies = ["Django==6.0.7", "django-allauth==65.18.0", "django-allauth-ui==1.8.1", "django-widget-tweaks==1.5.1", "slippers==0.6.3", "python-dotenv==1.2.2", "django-ninja==1.6.2", "pydantic==2.13.4", "gunicorn==26.2.0"]
 requires-python = "==3.12.*"
 readme = "README.md"
 license = "MPL-2.0"
