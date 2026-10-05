@@ -1,0 +1,357 @@
+{% extends "core/bare-base.html" %}
+{% load static %}
+
+{% comment "License" %}
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at http://mozilla.org/MPL/2.0/.
+{% endcomment %}
+
+{% block extrahead %}
+<style>
+    body {
+        background-color: #0f3c42;
+        color: #e2f5f4;
+        font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    }
+    .matte-card {
+        background-color: #1d5f66;
+        box-shadow: 0 4px 6px -1px rgba(15, 60, 66, 0.4), 0 2px 4px -1px rgba(15, 60, 66, 0.2);
+        border: 1px solid rgba(92, 220, 213, 0.15);
+    }
+    .drag-item {
+        cursor: grab;
+        user-select: none;
+        touch-action: none;
+    }
+    .drag-item:active {
+        cursor: grabbing;
+    }
+    .timeline-slot {
+        transition: all 0.2s ease-in-out;
+    }
+    .incorrect {
+        border-color: red !important;
+    }
+</style>
+{% endblock extrahead %}
+
+{% block content %} 
+<div class="h-full flex flex-col justify-between selection:bg-[#2bb6af] selection:text-[#0f3c42]">
+<header class="w-full py-6 px-6 border-b border-[#164e54]/50 bg-[#0f3c42]/90 backdrop-blur-sm sticky top-0 z-10">
+    <div class="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div>
+            <h1 class="text-2xl font-bold tracking-wide text-[#5cdcd5]">Oyster Lifecycle Timeline</h1>
+            <p class="text-sm text-[#e2f5f4]/70">Drag each stage to the timeline.</p>
+        </div>
+        <div class="flex items-center gap-4">
+            <div class="text-xs font-medium px-3 py-1.5 rounded-full bg-[#164e54] border border-[#2bb6af]/30 text-[#e2f5f4]">
+                Progress: <span id="progress-count" class="font-bold text-[#5cdcd5]">0</span> / 4 Placed
+            </div>
+            <button onclick="resetTimeline()" class="px-4 py-2 text-xs font-semibold uppercase tracking-wider rounded bg-[#2bb6af] hover:bg-[#5cdcd5] text-[#0f3c42] transition-colors shadow-sm">
+                Reset
+            </button>
+        </div>
+    </div>
+</header>
+
+<main class="flex-1 max-w-5xl w-full mx-auto p-4 sm:p-6 flex flex-col justify-center gap-8">
+    
+    <section class="w-full">
+        <div class="mb-3 flex items-center justify-between">
+            <h2 class="text-xs font-semibold uppercase tracking-widest text-[#5cdcd5]">Timeline</h2>
+        </div>
+        
+        <div class="grid grid-cols-1 sm:grid-cols-4 gap-4 relative">
+            
+            <div class="timeline-slot matte-card rounded-xl p-4 flex flex-col items-center justify-center min-h-[140px] border-2 border-dashed border-[#2bb6af]/30 relative" 
+                    data-slot="1" 
+                    ondragover="allowDrop(event)" 
+                    ondragleave="removeDropStyle(event)"
+                    ondrop="dropStage(event, 1)">
+                <div class="absolute top-2 left-3 w-6 h-6 rounded-full bg-[#164e54] text-[#5cdcd5] text-xs font-bold flex items-center justify-center border border-[#2bb6af]/20">1</div>
+                <div class="slot-content w-full h-full flex items-center justify-center text-center mt-3">
+                    <span class="text-xs text-[#e2f5f4]/50 italic pointer-events-none">Drop Stage 1 Here</span>
+                </div>
+            </div>
+
+            <div class="timeline-slot matte-card rounded-xl p-4 flex flex-col items-center justify-center min-h-[140px] border-2 border-dashed border-[#2bb6af]/30 relative" 
+                    data-slot="2" 
+                    ondragover="allowDrop(event)" 
+                    ondragleave="removeDropStyle(event)"
+                    ondrop="dropStage(event, 2)">
+                <div class="absolute top-2 left-3 w-6 h-6 rounded-full bg-[#164e54] text-[#5cdcd5] text-xs font-bold flex items-center justify-center border border-[#2bb6af]/20">2</div>
+                <div class="slot-content w-full h-full flex items-center justify-center text-center mt-3">
+                    <span class="text-xs text-[#e2f5f4]/50 italic pointer-events-none">Drop Stage 2 Here</span>
+                </div>
+            </div>
+
+            <div class="timeline-slot matte-card rounded-xl p-4 flex flex-col items-center justify-center min-h-[140px] border-2 border-dashed border-[#2bb6af]/30 relative" 
+                    data-slot="3" 
+                    ondragover="allowDrop(event)" 
+                    ondragleave="removeDropStyle(event)"
+                    ondrop="dropStage(event, 3)">
+                <div class="absolute top-2 left-3 w-6 h-6 rounded-full bg-[#164e54] text-[#5cdcd5] text-xs font-bold flex items-center justify-center border border-[#2bb6af]/20">3</div>
+                <div class="slot-content w-full h-full flex items-center justify-center text-center mt-3">
+                    <span class="text-xs text-[#e2f5f4]/50 italic pointer-events-none">Drop Stage 3 Here</span>
+                </div>
+            </div>
+
+            <div class="timeline-slot matte-card rounded-xl p-4 flex flex-col items-center justify-center min-h-[140px] border-2 border-dashed border-[#2bb6af]/30 relative" 
+                    data-slot="4" 
+                    ondragover="allowDrop(event)" 
+                    ondragleave="removeDropStyle(event)"
+                    ondrop="dropStage(event, 4)">
+                <div class="absolute top-2 left-3 w-6 h-6 rounded-full bg-[#164e54] text-[#5cdcd5] text-xs font-bold flex items-center justify-center border border-[#2bb6af]/20">4</div>
+                <div class="slot-content w-full h-full flex items-center justify-center text-center mt-3">
+                    <span class="text-xs text-[#e2f5f4]/50 italic pointer-events-none">Drop Stage 4 Here</span>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <section class="w-full">
+        <div class="mb-3 flex items-center justify-between">
+            <h2 class="text-xs font-semibold uppercase tracking-widest text-[#5cdcd5]">Word Bank</h2>
+        </div>
+        
+        <div id="stages-bank" class="matte-card rounded-xl p-4 min-h-[100px] flex flex-wrap gap-4 items-center justify-center sm:justify-start border border-[#2bb6af]/20"
+                ondragover="allowDrop(event)" 
+                ondrop="dropToBank(event)">
+                
+            <div id="stage-egg" class="drag-item bg-[#164e54] hover:bg-[#1d5f66] border border-[#2bb6af]/40 text-[#5cdcd5] px-5 py-3 rounded-lg font-medium text-sm transition-all shadow-sm"
+                    draggable="true" 
+                    ondragstart="drag(event)" 
+                    data-stage="egg" 
+                    data-correct="1">
+                Egg
+            </div>
+
+            <div id="stage-larva" class="drag-item bg-[#164e54] hover:bg-[#1d5f66] border border-[#2bb6af]/40 text-[#5cdcd5] px-5 py-3 rounded-lg font-medium text-sm transition-all shadow-sm"
+                    draggable="true" 
+                    ondragstart="drag(event)" 
+                    data-stage="larva" 
+                    data-correct="2">
+                Larva
+            </div>
+
+            <div id="stage-spat" class="drag-item bg-[#164e54] hover:bg-[#1d5f66] border border-[#2bb6af]/40 text-[#5cdcd5] px-5 py-3 rounded-lg font-medium text-sm transition-all shadow-sm"
+                    draggable="true" 
+                    ondragstart="drag(event)" 
+                    data-stage="spat" 
+                    data-correct="3">
+                Spat
+            </div>
+
+            <div id="stage-adult" class="drag-item bg-[#164e54] hover:bg-[#1d5f66] border border-[#2bb6af]/40 text-[#5cdcd5] px-5 py-3 rounded-lg font-medium text-sm transition-all shadow-sm"
+                    draggable="true" 
+                    ondragstart="drag(event)" 
+                    data-stage="adult" 
+                    data-correct="4">
+                Adult
+            </div>
+
+        </div>
+    </section>
+
+</main>
+
+<div id="info-modal" class="fixed inset-0 bg-[#0f3c42]/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="matte-card max-w-md w-full rounded-2xl p-6 border border-[#2bb6af]/40 shadow-2xl relative">
+        <div class="absolute -top-3 left-6 bg-[#2bb6af] text-[#0f3c42] text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full">
+            Correct!
+        </div>
+        <h3 id="modal-title" class="text-xl font-bold text-[#5cdcd5] mt-2 mb-3">stage name</h3>
+        <p id="modal-description" class="text-sm text-[#e2f5f4] leading-relaxed mb-6">desc</p>
+        <div class="flex justify-end">
+            <button onclick="closeModal()" class="px-5 py-2 text-xs font-bold uppercase tracking-wider rounded bg-[#2bb6af] hover:bg-[#5cdcd5] text-[#0f3c42] transition-colors">
+                Continue Timeline
+            </button>
+        </div>
+    </div>
+</div>
+
+<div id="victory-modal" class="fixed inset-0 bg-[#0f3c42]/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="matte-card max-w-md w-full rounded-2xl p-6 border border-[#5cdcd5] shadow-2xl text-center">
+        <h3 class="text-2xl font-bold text-[#5cdcd5] mb-2">Timeline Complete!</h3>
+        <p class="text-sm text-[#e2f5f4] leading-relaxed mb-6">You have successfully ordered all four stages of the oyster lifecycle from egg to adult.</p>
+        <button onclick="resetTimeline()" class="px-6 py-2.5 text-xs font-bold uppercase tracking-wider rounded bg-[#2bb6af] hover:bg-[#5cdcd5] text-[#0f3c42] transition-colors shadow-md">
+            Restart Timeline
+        </button>
+    </div>
+</div>
+</div>
+{% endblock content %}
+
+{% block extrabody %}
+<script>
+    const stageDetails = {
+        egg: {
+            title: "Egg",
+            desc: "Oysters begin life as tiny eggs in the water. The eggs develop and soon grow into microscopic larvae."
+        },
+        larva: {
+            title: "Larva",
+            desc: "The larva is tiny and free-swimming. It drifts through the water and grows while searching for a good place to settle. It looks for a hard surface, such as an old oyster shell."
+        },
+        spat: {
+            title: "Spat",
+            desc: "When the larva settles onto a hard surface, it becomes a spat, which is a young oyster. It attaches to the surface, grows its shell, and begins filtering tiny food particles from the water."
+        },
+        adult: {
+            title: "Adult",
+            desc: "The spat continues to grow until it becomes an adult oyster. Adult oysters stay attached to a hard surface and filter food from the water. When they reproduce, they produce new eggs and the life cycle begins again."
+        }
+    };
+
+    let placedCount = 0;
+
+    function allowDrop(ev) {
+        ev.preventDefault();
+        const slot = ev.currentTarget.closest(".timeline-slot");
+        if (slot && !slot.classList.contains("incorrect")) {
+            slot.style.borderColor = "#5cdcd5";
+        }
+    }
+
+    function removeDropStyle(ev) {
+        const slot = ev.currentTarget.closest(".timeline-slot");
+        if (slot && !slot.classList.contains("incorrect")) {
+            slot.style.borderColor = "rgba(43, 182, 175, 0.3)";
+        }
+    }
+
+    function drag(ev) {
+        ev.dataTransfer.setData("text/plain", ev.target.id);
+    }
+
+    function dropToBank(ev) {
+        ev.preventDefault();
+        const id = ev.dataTransfer.getData("text/plain");
+        const element = document.getElementById(id);
+        const bank = document.getElementById("stages-bank");
+        if (element && bank) {
+            const previousSlot = element.closest(".timeline-slot");
+            if (previousSlot) {
+                previousSlot.innerHTML = `
+                    <div class="absolute top-2 left-3 w-6 h-6 rounded-full bg-[#164e54] text-[#5cdcd5] text-xs font-bold flex items-center justify-center border border-[#2bb6af]/20">${previousSlot.dataset.slot}</div>
+                    <div class="slot-content w-full h-full flex items-center justify-center text-center mt-3">
+                        <span class="text-xs text-[#e2f5f4]/50 italic pointer-events-none">Drop Stage ${previousSlot.dataset.slot} Here<br>(${getStageName(previousSlot.dataset.slot)})</span>
+                    </div>
+                `;
+                placedCount = Math.max(0, placedCount - 1);
+                updateProgressDisplay();
+            }
+            bank.appendChild(element);
+        }
+    }
+
+    function getStageName(slotNum) {
+        switch(slotNum) {
+            case "1": return "Egg";
+            case "2": return "Larva";
+            case "3": return "Spat";
+            case "4": return "Adult";
+            default: return "";
+        }
+    }
+
+    function dropStage(ev, targetSlotNumber) {
+        ev.preventDefault();
+        const id = ev.dataTransfer.getData("text/plain");
+        const element = document.getElementById(id);
+        const slot = ev.currentTarget.closest(".timeline-slot");
+        
+        if (!element || !slot) return;
+
+        slot.style.borderColor = "rgba(43, 182, 175, 0.3)";
+
+        const correctSlot = parseInt(element.dataset.correct, 10);
+
+        if (correctSlot === targetSlotNumber) {
+            const existingItem = slot.querySelector(".drag-item");
+            if (existingItem) {
+                document.getElementById("stages-bank").appendChild(existingItem);
+                placedCount = Math.max(0, placedCount - 1);
+            }
+
+            const slotNumberLabel = slot.dataset.slot;
+            slot.innerHTML = `
+                <div class="absolute top-2 left-3 w-6 h-6 rounded-full bg-[#164e54] text-[#5cdcd5] text-xs font-bold flex items-center justify-center border border-[#2bb6af]/20">${slotNumberLabel}</div>
+            `;
+            slot.appendChild(element);
+
+            placedCount++;
+            updateProgressDisplay();
+
+            const stageKey = element.dataset.stage;
+            showInfoModal(stageKey);
+        } else {
+            slot.classList.add("incorrect");
+            
+            const previousSlot = element.closest(".timeline-slot");
+            if (previousSlot && previousSlot !== slot) {
+                previousSlot.innerHTML = `
+                    <div class="absolute top-2 left-3 w-6 h-6 rounded-full bg-[#164e54] text-[#5cdcd5] text-xs font-bold flex items-center justify-center border border-[#2bb6af]/20">${previousSlot.dataset.slot}</div>
+                    <div class="slot-content w-full h-full flex items-center justify-center text-center mt-3">
+                        <span class="text-xs text-[#e2f5f4]/50 italic pointer-events-none">Drop Stage ${previousSlot.dataset.slot} Here<br>(${getStageName(previousSlot.dataset.slot)})</span>
+                    </div>
+                `;
+                placedCount = Math.max(0, placedCount - 1);
+                updateProgressDisplay();
+            }
+
+            setTimeout(() => {
+                document.getElementById("stages-bank").appendChild(element);
+                slot.classList.remove("incorrect");
+            }, 400);
+        }
+    }
+
+    function updateProgressDisplay() {
+        document.getElementById("progress-count").textContent = placedCount;
+    }
+
+    function showInfoModal(stageKey) {
+        const data = stageDetails[stageKey];
+        if (!data) return;
+        document.getElementById("modal-title").textContent = data.title;
+        document.getElementById("modal-description").textContent = data.desc;
+        document.getElementById("info-modal").classList.remove("hidden");
+    }
+
+    function closeModal() {
+        document.getElementById("info-modal").classList.add("hidden");
+        if (placedCount === 4) {
+            setTimeout(() => {
+                document.getElementById("victory-modal").classList.remove("hidden");
+            }, 500);
+        }
+    }
+
+    function resetTimeline() {
+        document.getElementById("info-modal").classList.add("hidden");
+        document.getElementById("victory-modal").classList.add("hidden");
+        
+        const bank = document.getElementById("stages-bank");
+        const slots = document.querySelectorAll(".timeline-slot");
+
+        slots.forEach(slot => {
+            const item = slot.querySelector(".drag-item");
+            if (item) {
+                bank.appendChild(item);
+            }
+            slot.innerHTML = `
+                <div class="absolute top-2 left-3 w-6 h-6 rounded-full bg-[#164e54] text-[#5cdcd5] text-xs font-bold flex items-center justify-center border border-[#2bb6af]/20">${slot.dataset.slot}</div>
+                <div class="slot-content w-full h-full flex items-center justify-center text-center mt-3">
+                    <span class="text-xs text-[#e2f5f4]/50 italic pointer-events-none">Drop Stage ${slot.dataset.slot} Here</span>
+                </div>
+            `;
+        });
+
+        placedCount = 0;
+        updateProgressDisplay();
+    }
+</script>
+{% endblock extrabody %}

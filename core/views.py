@@ -43,3 +43,8 @@ def index(request):
 @no_csrf
 def dashboard(request):
     return render(request, "core/dashboard.html")
+
+@no_csrf
+@xframe_options_sameorigin
+def interactive_lifecycle_timeline(request):
+    return render(request, "core/games/lifecycle-timeline.html")

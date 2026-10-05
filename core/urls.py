@@ -8,6 +8,7 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
+    path('games/lifecycle-timeline/', views.interactive_lifecycle_timeline, name="interactive_lifecycle_timeline"),
     path('dashboard/', views.dashboard, name="dashboard"),
     path('', views.index, name="home"),
 ]
