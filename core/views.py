@@ -53,3 +53,8 @@ def interactive_lifecycle_timeline(request):
 @xframe_options_sameorigin
 def anatomy_chatbot(request):
     return render(request, "core/games/anatomy-chatbot.html")
+
+@no_csrf
+@xframe_options_sameorigin
+def habitat_survival(request):
+    return render(request, "core/games/habitat-survival.html")
