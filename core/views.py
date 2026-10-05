@@ -48,3 +48,8 @@ def dashboard(request):
 @xframe_options_sameorigin
 def interactive_lifecycle_timeline(request):
     return render(request, "core/games/lifecycle-timeline.html")
+
+@no_csrf
+@xframe_options_sameorigin
+def anatomy_chatbot(request):
+    return render(request, "core/games/anatomy-chatbot.html")

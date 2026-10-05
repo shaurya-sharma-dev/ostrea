@@ -9,6 +9,7 @@ from . import views
 
 urlpatterns = [
     path('games/lifecycle-timeline/', views.interactive_lifecycle_timeline, name="interactive_lifecycle_timeline"),
+    path('games/anatomy-chatbot/', views.anatomy_chatbot, name="anatomy_chatbot"),
     path('dashboard/', views.dashboard, name="dashboard"),
     path('', views.index, name="home"),
 ]

@@ -1,0 +1,90 @@
+{% extends "core/bare-base.html" %}
+{% load static %}
+
+{% comment "License" %}
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at http://mozilla.org/MPL/2.0/.
+{% endcomment %}
+
+{% block content %}
+<main class="flex h-screen w-screen items-center justify-center bg-gray-100">
+  <div class="flex flex-col w-96 max-w-full h-[500px] bg-white border border-gray-200 rounded-xl shadow-2xl p-4">
+    <div id="chatbot-messages" class="flex-1 overflow-y-auto mb-4 space-y-2 p-2 border border-gray-100 rounded-lg bg-gray-50"></div>
+    <div class="flex gap-2">
+      <input type="text" class="flex-1 px-3 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" id="chatbot-input" placeholder="Type a message...">
+      <button id="chatbot-submit" class="px-4 py-2 bg-blue-500 hover:bg-blue-700 active:bg-blue-900 rounded-md text-white transition-colors" onclick="sendMessage();">Send</button>
+    </div>
+  </div>
+</main>
+{% endblock content %}
+
+{% block extrabody %}
+<script>
+const oysterParts = {
+    "shell": "Outermost layer of an oyster; protects its body.",
+    "mantle": "Builds and repairs the shell.",
+    "adductor muscle": "Holds the shell tightly shut, only slightly opening to feed.",
+    "gills": "Help the oyster take in oxygen from the water (breathing) and takes in food.",
+    "labial palps": "Sorts food particles trapped by the gills.",
+    "mouth": "Opening where food enters stomach from labial palps.",
+    "stomach": "Breaks down filtered food for nutrients.",
+    "heart": "Circulates hemolymph (oyster's equivalent of blood) throughout the body."
+};
+const messagesDiv = document.getElementById("chatbot-messages");
+const messageInput = document.getElementById("chatbot-input");
+const messageSubmitButton = document.getElementById("chatbot-submit");
+const totalParts = Object.keys(oysterParts).length;
+let discoveredParts = new Set();
+
+function addMessageToDOM(sender, messageBody){
+    let messageNode = document.createElement("div");
+    messageNode.classList.add("alert", "bg-gray-50", "dark:bg-gray-900", "dark:text-white", "p-5", "rounded-full");
+    console.log(messageBody.replace(/\n/g, "<br>"))
+    messageNode.insertAdjacentHTML("beforeend", `
+        <strong>${sender}</strong><br>
+        <span>${messageBody.replace("\n", "<br>")}</span>
+    `)
+    messagesDiv.appendChild(messageNode);
+}
+
+addMessageToDOM("Chatbot", "Welcome to the Oyster Anatomy Chatbot!\nLet's learn about the 8 key parts of an oyster anatomy. Ask me about any part (or type 'list' to see what's left).");
+
+function sendMessage() {
+    let remainingCount = totalParts - discoveredParts.size;
+    let userInput = messageInput.value;
+    addMessageToDOM("You", userInput);
+    messageInput.value = "";
+
+    if (userInput === null) {
+        addMessageToDOM("Chatbot", "Please send a valid message.");
+        return;
+    }
+
+    let cleanedInput = userInput.trim().toLowerCase();
+
+    if (cleanedInput === "list") {
+        let remaining = Object.keys(oysterParts)
+            .filter(part => !discoveredParts.has(part))
+            .join(", ");
+        addMessageToDOM("Chatbot", "Parts you haven't discovered yet:\n" + remaining);
+        return;
+    }
+
+    if (oysterParts.hasOwnProperty(cleanedInput)) {
+        if (!discoveredParts.has(cleanedInput)) {
+            discoveredParts.add(cleanedInput);
+            addMessageToDOM("Chatbot", `You found a new part: ${cleanedInput.toUpperCase()}\n\nDescription: ${oysterParts[cleanedInput]}\n\n(${totalParts - discoveredParts.size} parts remaining!)`);
+        } else {
+            addMessageToDOM("Chatbot", `You already discovered the ${cleanedInput}!\n\nDescription: ${oysterParts[cleanedInput]}`);
+        }
+    } else {
+        addMessageToDOM("Chatbot", `Hmm, I don't recognize that part in our 8 oyster anatomy components. Try asking about things like "shell", "gills", "heart", or type "list" to see what's missing!`);
+    }
+    
+    if (discoveredParts.size == totalParts){
+        addMessageToDOM("Chatbot", "Congrats!\nYou have successfully learned all 8 major parts of the oyster anatomy!");
+    }
+}
+</script>
+{% endblock extrabody %}
