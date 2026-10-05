@@ -253,6 +253,7 @@ async function buildDOM(){
             if (units.length === 0){
                 subContainerDiv.insertAdjacentHTML("beforeend", "<p class='pt-4'>Lessons coming soon!</p>")
             } else {
+                units = [units[0]];
                 for (var i = 0; i < units.length; i ++){
                     let desc = units[i].description || "No description provided.";
                     let lessonCount = (await fetchAPI(`/api/lessons/get-lessons-in-unit?unit_id=${units[i].id}`)).length;
