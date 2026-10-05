@@ -151,8 +151,10 @@ const ARTICLE_KEYWORDS = {
     "INTERACTIVE:OYSTER_ANATOMY_CHATBOT": `<iframe src="/games/anatomy-chatbot/" title="Oyster Anatomy Chatbot" class="w-full max-w-5xl min-h-[85vh]"></iframe>`,
     "GAME:LIFECYCLE_TIMELINE": `<iframe src="/games/lifecycle-timeline/" title="Oyster Lifecycle Timeline" class="w-full max-w-5xl min-h-[85vh]"></iframe>`,
     "GAME:HABITAT_SURVIVAL_YES_NO": `<iframe src="/games/habitat-survival/" title="Oyster Lifecycle Timeline" class="w-full max-w-5xl min-h-[85vh]"></iframe>`,
+    "RES:OYSTER_LIFECYCLE_INFOGRAPHIC": `<iframe src="/static/misc/oyster-lifecycle-infographic.pdf" title="Oyster Lifecycle Timeline" class="w-full max-w-5xl min-h-[85vh]"></iframe>`,
+    "RES:MEET_THE_OYSTER_SLIDES": `<iframe src="https://docs.google.com/presentation/d/e/2PACX-1vSXUTSd6Jy59XqOWNOKBV0r-L0u9h8BH9Y-spn1WVU_bNTY-VV0WQJVjVS7t16CoG0aPbHflcgcS8oM/pubembed?start=false&loop=false&delayms=3000" frameborder="0" width="480" height="299" allowfullscreen="true" mozallowfullscreen="true" webkitallowfullscreen="true"></iframe>`,
+    "RES:MEET_THE_OYSTER_NOTES": `<iframe src="https://docs.google.com/document/d/e/2PACX-1vRHnYU0oeZInv0deti19GQtSclqlDc2B21ngAXLboXwrmyeVXQzePUzY0R34KcwIN1tTGJrGNRbUyPG/pub?embedded=true" width="700" height="299"></iframe>`,
 }
-
 async function buildDOM(){
     if (pageState === null){
         console.error("No page state selected.")
