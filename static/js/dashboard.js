@@ -168,13 +168,10 @@ async function buildDOM(){
     if (stateId === "localCreation"){
         dashboardDiv.insertAdjacentHTML("beforebegin", `<form id="profile-create-form">
             <h2 class="text-3xl font-bold py-4">Create Local Profile</h2>
-            <p>This information will be stored on your device, and it is required in order to properly use Ostrea.</p>
-            <p>Are you a teacher or student?</p>
+            <p>If you are a teacher, please use the lesson plan materials instead of using this page.</p>
+            <p>If you are a student, click the below button to get started with using Ostrea!</p>
             <br>
-            <div class="grid grid-cols-2 gap-4 text-white">
-                <button class="rounded-full bg-blue-500 hover:bg-blue-700 cursor-pointer py-2" onclick='db.put("user", 1, {"joined": new Date(), "role": "student"});'>Student</button>
-                <button class="rounded-full bg-blue-500 hover:bg-blue-700 cursor-pointer py-2" onclick='db.put("user", 1, {"joined": new Date(), "role": "teacher"});'>Teacher</button>
-            </div>
+            <button class="rounded-full bg-blue-500 hover:bg-blue-700 cursor-pointer py-2 w-full" onclick='db.put("user", 1, {"joined": new Date(), "role": "student"});'>Get started!</button>
         </form>`);
 
     } else if (stateId === "studentTracker"){
@@ -269,16 +266,6 @@ async function buildDOM(){
             }
         }
 
-    } else if (stateId === "teacherLanding"){
-        subContainerDiv.innerHTML = "";
-        subContainerDiv.insertAdjacentHTML("beforebegin", `<h2 class="text-3xl font-bold py-2">Welcome, teacher!</h2>
-        <p>How will you use Ostrea today?</p>
-        <div class="grid grid-cols-3 gap-4 text-white py-4">
-            <button class="rounded-full bg-blue-500 hover:bg-blue-700 cursor-pointer py-2" onclick='console.log("add student");'>Add Student</button>
-            <button class="rounded-full bg-blue-500 hover:bg-blue-700 cursor-pointer py-2" onclick='console.log("request sync");'>Request Sync</button>
-            <button class="rounded-full bg-blue-500 hover:bg-blue-700 cursor-pointer py-2" onclick='console.log("view data");'>View Student Data</button>
-        </div>`);
-
     } else {
         console.error("Invalid page state ID:", stateId);
     }
@@ -318,8 +305,6 @@ db.connect().then(async () => {
         if (window.location.search === ""){
             if (user.role === "student"){
                 window.location.replace("/dashboard?page=studentTracker");
-            } else if (user.role == "teacher"){
-                window.location.replace("/dashboard?page=teacherLanding");
             }
         } else {
             if (pageId === "localCreation"){
