@@ -155,6 +155,7 @@ const ARTICLE_KEYWORDS = {
     "RES:MEET_THE_OYSTER_SLIDES": `<iframe src="https://docs.google.com/presentation/d/e/2PACX-1vSXUTSd6Jy59XqOWNOKBV0r-L0u9h8BH9Y-spn1WVU_bNTY-VV0WQJVjVS7t16CoG0aPbHflcgcS8oM/pubembed?start=false&loop=false&delayms=3000" frameborder="0" width="480" height="299" allowfullscreen="true" mozallowfullscreen="true" webkitallowfullscreen="true"></iframe>`,
     "RES:MEET_THE_OYSTER_NOTES": `<iframe src="https://docs.google.com/document/d/e/2PACX-1vRHnYU0oeZInv0deti19GQtSclqlDc2B21ngAXLboXwrmyeVXQzePUzY0R34KcwIN1tTGJrGNRbUyPG/pub?embedded=true" width="700" height="299"></iframe>`,
     "RES:SURVIVAL_KIT": `<iframe src="/static/misc/oyster-survival-kit.pdf" title="Oyster Survival Kit" class="w-full max-w-5xl min-h-[85vh]"></iframe>`,
+    "GAME:CHESAPEAKE_FOOD_WEB": `<iframe src="/games/chesapeake-food-web/" title="Chesapeake Food Web" class="w-full max-w-5xl min-h-[85vh]"></iframe>`,
 }
 
 async function buildDOM(){

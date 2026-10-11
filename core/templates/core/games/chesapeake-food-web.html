@@ -1,0 +1,476 @@
+{% extends "core/bare-base.html" %}
+{% load static %}
+
+{% comment "License" %}
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at http://mozilla.org/MPL/2.0/.
+{% endcomment %}
+
+{% block extrahead %}
+<style>
+    body {
+        background-color: #0f3c42;
+        color: #e2f5f4;
+        font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    }
+    .matte-card {
+        background-color: #1d5f66;
+        box-shadow: 0 4px 6px -1px rgba(15, 60, 66, 0.4), 0 2px 4px -1px rgba(15, 60, 66, 0.2);
+        border: 1px solid rgba(92, 220, 213, 0.15);
+    }
+    .drag-item {
+        cursor: grab;
+        user-select: none;
+        touch-action: none;
+    }
+    .drag-item:active {
+        cursor: grabbing;
+    }
+    .slot {
+        transition: all 0.2s ease-in-out;
+        z-index: 2;
+    }
+    .incorrect {
+        border-color: red !important;
+    }
+</style>
+{% endblock extrahead %}
+
+{% block content %} 
+<div class="h-full flex flex-col justify-between selection:bg-[#2bb6af] selection:text-[#0f3c42]">
+<header class="w-full py-6 px-6 border-b border-[#164e54]/50 bg-[#0f3c42]/90 backdrop-blur-sm sticky top-0 z-10">
+    <div class="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div>
+            <h1 class="text-2xl font-bold tracking-wide text-[#5cdcd5]">Chesapeake Food Web</h1>
+            <p class="text-sm text-[#e2f5f4]/70">Drag each organism to the food web.</p>
+        </div>
+        <div class="flex items-center gap-4">
+            <div class="text-xs font-medium px-3 py-1.5 rounded-full bg-[#164e54] border border-[#2bb6af]/30 text-[#e2f5f4]">
+                Progress: <span id="progress-count" class="font-bold text-[#5cdcd5]">0</span> / 9 Placed
+            </div>
+            <button onclick="reset()" class="px-4 py-2 text-xs font-semibold uppercase tracking-wider rounded bg-[#2bb6af] hover:bg-[#5cdcd5] text-[#0f3c42] transition-colors shadow-sm">
+                Reset
+            </button>
+        </div>
+    </div>
+</header>
+
+<main class="flex-1 max-w-5xl w-full mx-auto p-4 sm:p-6 flex flex-col justify-center gap-8">
+    
+    <section class="w-full">
+        <div class="mb-3 flex items-center justify-between">
+            <h2 class="text-xs font-semibold uppercase tracking-widest text-[#5cdcd5]">Web</h2>
+        </div>
+
+        <div id="dest-div" class="matte-card rounded-xl border border-[#2bb6af]/20 p-6 flex flex-col gap-6 items-center w-full max-w-5xl mx-auto">
+        
+        <div class="flex justify-center w-full">
+            <div class="slot matte-card rounded-xl p-4 flex flex-col items-center justify-center w-48 min-h-[110px] border-2 border-dashed border-[#2bb6af]/30" 
+                 data-slot="7" ondragover="allowDrop(event)" ondragleave="removeDropStyle(event)" ondrop="drop(event, 7)">
+                <div class="slot-content w-full h-full flex items-center justify-center text-center">
+                    <span class="text-xs text-[#e2f5f4]/50 italic pointer-events-none">Drop an Organism Here</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex flex-wrap justify-center gap-4 w-full">
+            <div class="slot matte-card rounded-xl p-4 flex flex-col items-center justify-center w-48 min-h-[110px] border-2 border-dashed border-[#2bb6af]/30" 
+                 data-slot="4" ondragover="allowDrop(event)" ondragleave="removeDropStyle(event)" ondrop="drop(event, 4)">
+                <div class="slot-content w-full h-full flex items-center justify-center text-center">
+                    <span class="text-xs text-[#e2f5f4]/50 italic pointer-events-none">Drop an Organism Here</span>
+                </div>
+            </div>
+            <div class="slot matte-card rounded-xl p-4 flex flex-col items-center justify-center w-48 min-h-[110px] border-2 border-dashed border-[#2bb6af]/30" 
+                 data-slot="5" ondragover="allowDrop(event)" ondragleave="removeDropStyle(event)" ondrop="drop(event, 5)">
+                <div class="slot-content w-full h-full flex items-center justify-center text-center">
+                    <span class="text-xs text-[#e2f5f4]/50 italic pointer-events-none">Drop an Organism Here</span>
+                </div>
+            </div>
+            <div class="slot matte-card rounded-xl p-4 flex flex-col items-center justify-center w-48 min-h-[110px] border-2 border-dashed border-[#2bb6af]/30" 
+                 data-slot="6" ondragover="allowDrop(event)" ondragleave="removeDropStyle(event)" ondrop="drop(event, 6)">
+                <div class="slot-content w-full h-full flex items-center justify-center text-center">
+                    <span class="text-xs text-[#e2f5f4]/50 italic pointer-events-none">Drop an Organism Here</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex flex-wrap justify-between items-center w-full px-2 sm:px-6 gap-4">
+            <div class="flex flex-wrap justify-center gap-4">
+                <div class="slot matte-card rounded-xl p-4 flex flex-col items-center justify-center w-48 min-h-[110px] border-2 border-dashed border-[#2bb6af]/30" 
+                     data-slot="2" ondragover="allowDrop(event)" ondragleave="removeDropStyle(event)" ondrop="drop(event, 2)">
+                    <div class="slot-content w-full h-full flex items-center justify-center text-center">
+                        <span class="text-xs text-[#e2f5f4]/50 italic pointer-events-none">Drop an Organism Here</span>
+                    </div>
+                </div>
+                <div class="slot matte-card rounded-xl p-4 flex flex-col items-center justify-center w-48 min-h-[110px] border-2 border-dashed border-[#2bb6af]/30" 
+                     data-slot="3" ondragover="allowDrop(event)" ondragleave="removeDropStyle(event)" ondrop="drop(event, 3)">
+                    <div class="slot-content w-full h-full flex items-center justify-center text-center">
+                        <span class="text-xs text-[#e2f5f4]/50 italic pointer-events-none">Drop an Organism Here</span>
+                    </div>
+                </div>
+                <div class="slot matte-card rounded-xl p-4 flex flex-col items-center justify-center w-48 min-h-[110px] border-2 border-dashed border-[#2bb6af]/30" 
+                     data-slot="9" ondragover="allowDrop(event)" ondragleave="removeDropStyle(event)" ondrop="drop(event, 9)">
+                    <div class="slot-content w-full h-full flex items-center justify-center text-center">
+                        <span class="text-xs text-[#e2f5f4]/50 italic pointer-events-none">Drop an Organism Here</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="slot matte-card rounded-xl p-4 flex flex-col items-center justify-center w-48 min-h-[110px] border-2 border-dashed border-[#2bb6af]/30 ml-auto" 
+                 data-slot="8" ondragover="allowDrop(event)" ondragleave="removeDropStyle(event)" ondrop="drop(event, 8)">
+                <div class="slot-content w-full h-full flex items-center justify-center text-center">
+                    <span class="text-xs text-[#e2f5f4]/50 italic pointer-events-none">Drop an Organism Here</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex justify-center w-full">
+            <div class="slot matte-card rounded-xl p-4 flex flex-col items-center justify-center w-48 min-h-[110px] border-2 border-dashed border-[#2bb6af]/30" 
+                 data-slot="1" ondragover="allowDrop(event)" ondragleave="removeDropStyle(event)" ondrop="drop(event, 1)">
+                <div class="slot-content w-full h-full flex items-center justify-center text-center">
+                    <span class="text-xs text-[#e2f5f4]/50 italic pointer-events-none">Drop an Organism Here</span>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    </section>
+
+    <section class="w-full">
+        <div class="mb-3 flex items-center justify-between">
+            <h2 class="text-xs font-semibold uppercase tracking-widest text-[#5cdcd5]">Word Bank</h2>
+        </div>
+        
+        <div id="bank" class="matte-card rounded-xl p-4 min-h-[100px] flex flex-wrap gap-4 items-center justify-center sm:justify-start border border-[#2bb6af]/20"
+                ondragover="allowDrop(event)" 
+                ondrop="dropToBank(event)">
+                
+            <div id="i-1" class="drag-item bg-[#164e54] hover:bg-[#1d5f66] border border-[#2bb6af]/40 text-[#5cdcd5] px-5 py-3 rounded-lg font-medium text-sm transition-all shadow-sm"
+                    draggable="true" 
+                    ondragstart="drag(event)" 
+                    data-key="phytoplankton" 
+                    data-correct="1">
+                Phytoplankton
+            </div>
+
+            <div id="i-2" class="drag-item bg-[#164e54] hover:bg-[#1d5f66] border border-[#2bb6af]/40 text-[#5cdcd5] px-5 py-3 rounded-lg font-medium text-sm transition-all shadow-sm"
+                    draggable="true" 
+                    ondragstart="drag(event)" 
+                    data-key="zooplankton" 
+                    data-correct="2">
+                Zooplankton
+            </div>
+
+            <div id="i-3" class="drag-item bg-[#164e54] hover:bg-[#1d5f66] border border-[#2bb6af]/40 text-[#5cdcd5] px-5 py-3 rounded-lg font-medium text-sm transition-all shadow-sm"
+                    draggable="true" 
+                    ondragstart="drag(event)" 
+                    data-key="oyster" 
+                    data-correct="3">
+                Oyster
+            </div>
+
+            <div id="i-4" class="drag-item bg-[#164e54] hover:bg-[#1d5f66] border border-[#2bb6af]/40 text-[#5cdcd5] px-5 py-3 rounded-lg font-medium text-sm transition-all shadow-sm"
+                    draggable="true" 
+                    ondragstart="drag(event)" 
+                    data-key="atlanticMenhaden" 
+                    data-correct="4">
+                Atlantic Menhaden
+            </div>
+
+            <div id="i-5" class="drag-item bg-[#164e54] hover:bg-[#1d5f66] border border-[#2bb6af]/40 text-[#5cdcd5] px-5 py-3 rounded-lg font-medium text-sm transition-all shadow-sm"
+                    draggable="true" 
+                    ondragstart="drag(event)" 
+                    data-key="seaNettle" 
+                    data-correct="5">
+                Sea Nettle
+            </div>
+
+            <div id="i-6" class="drag-item bg-[#164e54] hover:bg-[#1d5f66] border border-[#2bb6af]/40 text-[#5cdcd5] px-5 py-3 rounded-lg font-medium text-sm transition-all shadow-sm"
+                    draggable="true" 
+                    ondragstart="drag(event)" 
+                    data-key="blueCrab" 
+                    data-correct="6">
+                Blue Crab
+            </div>
+
+            <div id="i-7" class="drag-item bg-[#164e54] hover:bg-[#1d5f66] border border-[#2bb6af]/40 text-[#5cdcd5] px-5 py-3 rounded-lg font-medium text-sm transition-all shadow-sm"
+                    draggable="true" 
+                    ondragstart="drag(event)" 
+                    data-key="stripedBass" 
+                    data-correct="7">
+                Striped Bass
+            </div>
+
+            <div id="i-8" class="drag-item bg-[#164e54] hover:bg-[#1d5f66] border border-[#2bb6af]/40 text-[#5cdcd5] px-5 py-3 rounded-lg font-medium text-sm transition-all shadow-sm"
+                    draggable="true" 
+                    ondragstart="drag(event)" 
+                    data-key="bacteria" 
+                    data-correct="8">
+                Bacteria
+            </div>
+
+            <div id="i-9" class="drag-item bg-[#164e54] hover:bg-[#1d5f66] border border-[#2bb6af]/40 text-[#5cdcd5] px-5 py-3 rounded-lg font-medium text-sm transition-all shadow-sm"
+                    draggable="true" 
+                    ondragstart="drag(event)" 
+                    data-key="clam" 
+                    data-correct="9">
+                Clam
+            </div>
+
+        </div>
+    </section>
+
+</main>
+
+<div id="info-modal" class="fixed inset-0 bg-[#0f3c42]/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="matte-card max-w-md w-full rounded-2xl p-6 border border-[#2bb6af]/40 shadow-2xl relative">
+        <div class="absolute -top-3 left-6 bg-[#2bb6af] text-[#0f3c42] text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full">
+            Correct!
+        </div>
+        <h3 id="modal-title" class="text-xl font-bold text-[#5cdcd5] mt-2 mb-3">name</h3>
+        <p id="modal-description" class="text-sm text-[#e2f5f4] leading-relaxed mb-6">desc</p>
+        <div class="flex justify-end">
+            <button onclick="closeModal()" class="px-5 py-2 text-xs font-bold uppercase tracking-wider rounded bg-[#2bb6af] hover:bg-[#5cdcd5] text-[#0f3c42] transition-colors">
+                Continue Food Web
+            </button>
+        </div>
+    </div>
+</div>
+
+<div id="victory-modal" class="fixed inset-0 bg-[#0f3c42]/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="matte-card max-w-md w-full rounded-2xl p-6 border border-[#5cdcd5] shadow-2xl text-center">
+        <h3 class="text-2xl font-bold text-[#5cdcd5] mb-2">Food Web Complete!</h3>
+        <p class="text-sm text-[#e2f5f4] leading-relaxed mb-6">You have successfully placed all creatures in the food web.</p>
+        <button onclick="reset()" class="px-6 py-2.5 text-xs font-bold uppercase tracking-wider rounded bg-[#2bb6af] hover:bg-[#5cdcd5] text-[#0f3c42] transition-colors shadow-md">
+            Restart Food Web
+        </button>
+    </div>
+</div>
+</div>
+{% endblock content %}
+
+{% block extrabody %}
+<script src="{% static 'js/arrow-line.js' %}"></script>
+<script>
+    const details = {
+        phytoplankton: {
+            title: "Phytoplankton",
+            desc: "These microscopic, plant-like producers generate energy from sunlight using photosynthesis and serve as a fundamental food source for zooplankton."
+        },
+        zooplankton: {
+            title: "Zooplankton",
+            desc: "These tiny, drifting organisms eat phytoplankton and are preyed upon by creatures like the Atlantic Menhaden."
+        },
+        oyster: {
+            title: "Oyster",
+            desc: "These bivalve creatures consume large amounts of phytoplankton and serve as prey for creatures like the blue crab. They also produce shiny pearls."
+        },
+        clam: {
+            title: "Clam",
+            desc: "These bivalves consume phytoplankton and are preyed upon by creatures like the blue crab. They also produce duller pearls."
+        },
+        atlanticMenhaden: {
+            title: "Atlantic Menhaden",
+            desc: "These fish travel in dense schools and consume phytoplankton and zooplankton, while being a key food source for predators like striped bass."
+        },
+        seaNettle: {
+            title: "Sea Nettle",
+            desc: "These jelly-like creatures regulate the Bay ecosystem by consume zooplankton, small fish, fish eggs, worms, and other smaller creatures."
+        },
+        blueCrab: {
+            title: "Blue Crab",
+            desc: "These creatures move across the Bay's bottom, heavily preying upon bivalves like oysters."
+        },
+        stripedBass: {
+            title: "Striped Bass",
+            desc: "These fish are some of the Bay's top predators, relying heavily on prey like the Atlantic Menhaden for food."
+        },
+        bacteria: {
+            title: "Bacteria",
+            desc: "These microscopic organisms break down the organic waste and bodies of dead organisms, recycling nutrients back into the water for phytoplankton."
+        },
+    };
+
+    document.addEventListener('DOMContentLoaded', () => {
+        let c = document.getElementById("dest-div").children;
+        // Add vertical padding to each row of slots.
+        for (var i = 0; i < c.length; i ++){
+            c[i].classList.add("py-6")
+        }
+
+        // Manual connections.
+        arrowLine("[data-slot=\"1\"]", "[data-slot=\"2\"]", {forceDirection: 'horizontal', sourcePosition: 'topCenter', destinationPosition: 'bottomCenter', curvature: 0,});
+        arrowLine("[data-slot=\"1\"]", "[data-slot=\"3\"]", {forceDirection: 'horizontal', sourcePosition: 'topCenter', destinationPosition: 'bottomCenter', curvature: 0,});
+        arrowLine("[data-slot=\"1\"]", "[data-slot=\"9\"]", {forceDirection: 'horizontal', sourcePosition: 'topCenter', destinationPosition: 'bottomCenter', curvature: 0,});
+
+        arrowLine("[data-slot=\"2\"]", "[data-slot=\"4\"]", {forceDirection: 'horizontal', sourcePosition: 'topCenter', destinationPosition: 'bottomCenter', curvature: 0,});
+        arrowLine("[data-slot=\"2\"]", "[data-slot=\"5\"]", {forceDirection: 'horizontal', sourcePosition: 'topCenter', destinationPosition: 'bottomCenter', curvature: 0,});
+        arrowLine("[data-slot=\"2\"]", "[data-slot=\"6\"]", {forceDirection: 'horizontal', sourcePosition: 'topCenter', destinationPosition: 'bottomCenter', curvature: 0,});
+
+        arrowLine("[data-slot=\"3\"]", "[data-slot=\"6\"]", {forceDirection: 'horizontal', sourcePosition: 'topCenter', destinationPosition: 'bottomCenter', curvature: 0,});
+        arrowLine("[data-slot=\"9\"]", "[data-slot=\"6\"]", {forceDirection: 'horizontal', sourcePosition: 'topCenter', destinationPosition: 'bottomCenter', curvature: 0,});
+
+        arrowLine("[data-slot=\"4\"]", "[data-slot=\"7\"]", {forceDirection: 'horizontal', sourcePosition: 'topCenter', destinationPosition: 'bottomCenter', curvature: 0,});
+        arrowLine("[data-slot=\"5\"]", "[data-slot=\"7\"]", {forceDirection: 'horizontal', sourcePosition: 'topCenter', destinationPosition: 'bottomCenter', curvature: 0,});
+        arrowLine("[data-slot=\"6\"]", "[data-slot=\"7\"]", {forceDirection: 'horizontal', sourcePosition: 'topCenter', destinationPosition: 'bottomCenter', curvature: 0,});
+
+        // Connect everything to bacteria.
+        for (var i = 1; i < 9; i ++){
+            let idx = i;
+            if (i === 8){
+                let idx = 9;
+            }
+
+            arrowLine(`[data-slot="${idx}"]`, "[data-slot=\"8\"]", {forceDirection: 'horizontal', curvature: 0,});
+        }
+    });
+
+    let placedCount = 0;
+
+    function allowDrop(ev) {
+        ev.preventDefault();
+        const slot = ev.currentTarget.closest(".slot");
+        if (slot && !slot.classList.contains("incorrect")) {
+            slot.style.borderColor = "#5cdcd5";
+        }
+    }
+
+    function removeDropStyle(ev) {
+        const slot = ev.currentTarget.closest(".slot");
+        if (slot && !slot.classList.contains("incorrect")) {
+            slot.style.borderColor = "rgba(43, 182, 175, 0.3)";
+        }
+    }
+
+    function drag(ev) {
+        ev.dataTransfer.setData("text/plain", ev.target.id);
+    }
+
+    function dropToBank(ev) {
+        ev.preventDefault();
+        const id = ev.dataTransfer.getData("text/plain");
+        const element = document.getElementById(id);
+        const bank = document.getElementById("bank");
+        if (element && bank) {
+            const previousSlot = element.closest(".slot");
+            if (previousSlot) {
+                previousSlot.innerHTML = `
+                    <div class="slot-content w-full h-full flex items-center justify-center text-center mt-3">
+                        <span class="text-xs text-[#e2f5f4]/50 italic pointer-events-none">Drop an Organism Here<br></span>
+                    </div>
+                `;
+                placedCount = Math.max(0, placedCount - 1);
+                updateProgressDisplay();
+            }
+            bank.appendChild(element);
+        }
+    }
+
+    function drop(ev, targetSlotNumber) {
+        ev.preventDefault();
+        const id = ev.dataTransfer.getData("text/plain");
+        const element = document.getElementById(id);
+        const slot = ev.currentTarget.closest(".slot");
+        
+        if (!element || !slot) return;
+
+        slot.style.borderColor = "rgba(43, 182, 175, 0.3)";
+
+        const correctSlot = parseInt(element.dataset.correct, 10);
+
+        if (correctSlot === targetSlotNumber) {
+            const existingItem = slot.querySelector(".drag-item");
+            if (existingItem) {
+                document.getElementById("bank").appendChild(existingItem);
+                placedCount = Math.max(0, placedCount - 1);
+            }
+
+            slot.innerHTML = ``;
+            slot.appendChild(element);
+
+            placedCount++;
+            updateProgressDisplay();
+
+            showInfoModal(element.dataset.key);
+        } else {
+            slot.classList.add("incorrect");
+            
+            const previousSlot = element.closest(".slot");
+            if (previousSlot && previousSlot !== slot) {
+                previousSlot.innerHTML = `
+                    <div class="slot-content w-full h-full flex items-center justify-center text-center mt-3">
+                        <span class="text-xs text-[#e2f5f4]/50 italic pointer-events-none">Drop an Organism Here<br></span>
+                    </div>
+                `;
+                placedCount = Math.max(0, placedCount - 1);
+                updateProgressDisplay();
+            }
+
+            setTimeout(() => {
+                document.getElementById("bank").appendChild(element);
+                slot.classList.remove("incorrect");
+            }, 400);
+        }
+    }
+
+    function updateProgressDisplay() {
+        document.getElementById("progress-count").textContent = placedCount;
+    }
+
+    function showInfoModal(key) {
+        const data = details[key];
+        if (!data) return;
+        document.getElementById("modal-title").textContent = data.title;
+        document.getElementById("modal-description").textContent = data.desc;
+        document.getElementById("info-modal").classList.remove("hidden");
+    }
+
+    function closeModal() {
+        document.getElementById("info-modal").classList.add("hidden");
+        if (placedCount === 9) {
+            setTimeout(() => {
+                document.getElementById("victory-modal").classList.remove("hidden");
+            }, 500);
+        }
+    }
+
+    function reset() {
+        document.getElementById("info-modal").classList.add("hidden");
+        document.getElementById("victory-modal").classList.add("hidden");
+        
+        const bank = document.getElementById("bank");
+        const slots = document.querySelectorAll(".slot");
+
+        slots.forEach(slot => {
+            const item = slot.querySelector(".drag-item");
+            if (item) {
+                bank.appendChild(item);
+            }
+            slot.innerHTML = `
+                <div class="slot-content w-full h-full flex items-center justify-center text-center mt-3">
+                    <span class="text-xs text-[#e2f5f4]/50 italic pointer-events-none">Drop an Organism Here</span>
+                </div>
+            `;
+        });
+
+        placedCount = 0;
+        updateProgressDisplay();
+    }
+
+    const EDGE_ZONE = 100;
+    const SCROLL_AMOUNT = -15;
+
+    document.querySelectorAll('.drag-item').forEach(item => {
+        item.addEventListener('drag', (e) => {
+            if (e.clientY === 0) return; 
+
+            if (e.clientY < EDGE_ZONE) {
+                window.scrollBy({ top: SCROLL_AMOUNT, behavior: 'smooth' });
+            }
+        });
+    });
+
+</script>
+{% endblock extrabody %}

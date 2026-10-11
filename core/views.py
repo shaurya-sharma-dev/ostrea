@@ -58,3 +58,8 @@ def anatomy_chatbot(request):
 @xframe_options_sameorigin
 def habitat_survival(request):
     return render(request, "core/games/habitat-survival.html")
+
+@no_csrf
+@xframe_options_sameorigin
+def chesapeake_food_web(request):
+    return render(request, "core/games/chesapeake-food-web.html")
