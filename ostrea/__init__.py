@@ -7,5 +7,3 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 # Metadata
 __title__ = "Ostrea"
 __license__ = "MPL-2.0"
-
-from ._version import __version_info__, __version__

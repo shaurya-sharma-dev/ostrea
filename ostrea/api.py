@@ -5,13 +5,11 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 """
 
 from ninja import NinjaAPI
-from . import __version__
 from core.endpoints import core_router
 from django.conf import settings
 
 api = NinjaAPI(
-    title="Ostrea API", 
-    version=__version__, 
+    title="Ostrea API",
     description="The API for the Ostrea web application.",
     urls_namespace="api",
     docs_url="/docs" if settings.DEBUG else None,

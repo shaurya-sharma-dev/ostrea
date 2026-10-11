@@ -1,6 +1,6 @@
 [project]
 name = "Ostrea"
-dynamic = ["version"]
+version = "1.0.0"
 description = "Ostrea is an educational website about oyster gardening."
 authors = [
     { name = "Shaurya Sharma" },
@@ -16,10 +16,5 @@ license-files = ["LICENSE*"]
 [tool.pdm]
 distribution = false
 
-[tool.pdm.version]
-source = "call"
-getter = "ostrea._version:_get_version_string"
-
 [tool.pdm.scripts]
-get-version = { call = "ostrea._version:_print_version_and_integrity" }
 test = "python manage.py test"
