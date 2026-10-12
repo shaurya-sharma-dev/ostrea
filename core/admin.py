@@ -131,4 +131,9 @@ class LessonAdmin(admin.ModelAdmin):
     list_display = ("name", "unit")
     list_filter = ("unit",)
 
-admin.site.register([Unit, Question])
+@admin.register(Question)
+class QuestionAdmin(admin.ModelAdmin):
+    list_display = ("lesson", "text", "correct_choice")
+    list_filter = ("lesson",)
+
+admin.site.register([Unit])
