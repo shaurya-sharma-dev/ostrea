@@ -49,20 +49,6 @@ class Database {
       };
     });
 
-    async function handleDOMRemoval() {
-        const user = await getUserObject(db);
-        if (user !== null){
-            let elements = document.querySelectorAll(".remove-for-non-staff");
-            for (var i = 0; i < elements.length; i ++){
-                elements[i].remove();
-            }
-        }
-    }
-    
-    document.addEventListener('DOMContentLoaded', () => {
-        handleDOMRemoval();
-    });
-
     return this.dbPromise;
   }
 
