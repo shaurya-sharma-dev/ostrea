@@ -44,7 +44,7 @@ function loadOysterGraph(ctx, token, attribute, yAxisLabel){
                     y: item[1],
                 })),
                 borderColor: 'rgb(75, 192, 192)',
-                tension: 0.2
+                tension: 0
             };
         });
 
