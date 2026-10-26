@@ -47,6 +47,5 @@ USER appuser
 # Expose the application port
 EXPOSE 8000 
  
-# Collectstatic Start the application using Gunicorn
-CMD ["python", "manage.py", "collectstatic", "--noinput"]
-CMD ["gunicorn", "--bind", "0.0.0.0:8000", "--workers", "3", "ostrea.wsgi:application"]
+# Collectstatic & start the application using Gunicorn
+CMD ["python", "manage.py", "collectstatic", "--noinput", "&&", "gunicorn", "--bind", "0.0.0.0:8000", "--workers", "3", "ostrea.wsgi:application"]
