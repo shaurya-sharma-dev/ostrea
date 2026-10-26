@@ -48,4 +48,4 @@ USER appuser
 EXPOSE 8000 
  
 # Collectstatic & start the application using Gunicorn
-CMD ["sh", "-c", "python", "manage.py", "collectstatic", "--noinput", "&&", "gunicorn", "--bind", "0.0.0.0:8000", "--workers", "3", "ostrea.wsgi:application"]
+CMD python manage.py collectstatic --noinput && gunicorn --bind 0.0.0.0:8000 --workers 3 ostrea.wsgi:application
