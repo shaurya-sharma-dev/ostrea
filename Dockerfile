@@ -20,9 +20,6 @@ COPY requirements-transitive.txt /app/
 # Install Python dependencies
 RUN pip install --no-cache-dir -r requirements-transitive.txt
 
-# Collect static files
-RUN python manage.py collectstatic --noinput
- 
 # Stage 2: Production stage
 FROM python:3.13-slim
  
@@ -50,5 +47,6 @@ USER appuser
 # Expose the application port
 EXPOSE 8000 
  
-# Start the application using Gunicorn
+# Collectstatic Start the application using Gunicorn
+CMD ["python", "manage.py", "collectstatic", "--noinput"]
 CMD ["gunicorn", "--bind", "0.0.0.0:8000", "--workers", "3", "ostrea.wsgi:application"]
