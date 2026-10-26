@@ -1,4 +1,5 @@
 {% extends "core/base.html" %}
+{% load static %}
 
 {% comment "License" %}
 This Source Code Form is subject to the terms of the Mozilla Public
@@ -6,28 +7,439 @@ License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at http://mozilla.org/MPL/2.0/.
 {% endcomment %}
 
+{% block extrahead %}
+<script src="{% static 'js/chart.js' %}"></script>
+<style>
+* {
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    margin: 0;
+    line-height: 1.7;
+}
+
+.intro {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 80px 24px;
+}
+
+.small {
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+}
+
+.intro h1 {
+    max-width: 850px;
+    margin: 20px 0;
+    font-size: clamp(3rem, 8vw, 6.5rem);
+    line-height: 1.05;
+    letter-spacing: -0.055em;
+}
+
+.intro-text {
+    max-width: 520px;
+    font-size: 1.15rem;
+}
+
+.story {
+    max-width: 760px;
+    margin: 0 auto;
+}
+
+.story-section {
+    min-height: 85vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.small {
+    margin-bottom: 20px;
+}
+
+.text-box {
+    padding: clamp(28px, 5vw, 56px);
+    border: 1px solid #e8e6df;
+    border-radius: 6px;
+    box-shadow: 0 15px 45px rgb(0 0 0 / 4%);
+}
+
+.text-box h2,
+.outro h2 {
+    margin: 0 0 20px;
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    line-height: 1.15;
+    letter-spacing: -0.035em;
+}
+
+.text-box p {
+    margin: 0;
+    font-size: 1.05rem;
+}
+
+.reveal {
+    opacity: 0;
+    transform: translateY(55px);
+    transition:
+    opacity 800ms ease,
+    transform 800ms cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+.reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.text-box h2,
+.text-box p {
+    opacity: 0;
+    transform: translateY(15px);
+    transition:
+    opacity 600ms ease,
+    transform 600ms ease;
+}
+
+.visible .text-box h2 {
+    opacity: 1;
+    transform: translateY(0);
+    transition-delay: 150ms;
+}
+
+.visible .text-box p {
+    opacity: 1;
+    transform: translateY(0);
+    transition-delay: 350ms;
+}
+
+.outro {
+    min-height: 80vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+.outro h2 {
+    max-width: 650px;
+}
+
+.story-section a{
+    color: rgb(0, 128, 255);
+    text-decoration-line: underline;
+}
+
+figcaption {
+    font-size: 12px;
+}
+</style>
+{% endblock extrahead %}
+
 {% block content %} 
-<h1 class="text-4xl font-bold py-4">Welcome to Ostrea, an Open-Source Website for Oyster Gardening Education!</h1>
-{% if not request.user.is_authenticated %}
-<p class="remove-for-non-staff">Are you a student? You don't need to sign up, just start using Ostrea by clicking <a class="text-blue-600 underline" href="/dashboard/">here</a>.</p>
-{% endif %}
-<h2 class="text-3xl font-bold py-4">Our Mission</h1>
-<p class="py-2">
-    Ostrea is an oyster-restoration education project created by siblings Shreya and Shaurya, students in Henrico County Public Schools. Our project began with a simple question: How can students in Henrico participate in Chesapeake Bay restoration even though they live far from the coast? We are building a website that allows students to follow a real oyster-restoration project from their classroom and learn about the Chesapeake Bay through direct observation, data, and hands-on activities.
+<header class="intro">
+<h1>Welcome to Ostrea!</h1>
+<p class="intro-text">
+    Scroll to Learn More. v
 </p>
+</header>
 
-<p class="py-2">
-    The heart of Ostrea is a classroom "adoption" program centered around a real oyster cage hosted by our partner organization, the Tidewater Oyster Gardeners Association (TOGA) and its Oyster Master Gardeners. Students will follow the oysters throughout a short program through photographs, field observations, and data such as growth stage, water temperature, and site conditions. The website will connect these observations to lessons about oysters, ecosystems, water quality, and Chesapeake Bay restoration, allowing students to see how what they learn in the classroom relates to a real ecosystem.
-</p>
+<main class="story">
 
-<p class="py-2">
-    Our mission is to make Chesapeake Bay restoration something that Henrico students can actively participate in, rather than simply learn about from a textbook. Through Ostrea, we hope to give students a direct connection to the Bay while introducing them to environmental science, data collection, and community-based restoration. We want to show students that they can contribute to protecting the Chesapeake Bay, even from miles away.
-</p>
+<section class="story-section reveal">
+    <span class="small">Who We Are</span>
+    <div class="text-box">
+    <h2>It starts with a question.</h2>
+    <p>
+        Ostrea is an oyster-restoration education project created by siblings Shreya and Shaurya, students in Henrico County Public Schools. Our project began with a simple question: How can students in Henrico participate in Chesapeake Bay restoration even though they live far from the coast? We are building a website that allows students to follow a real oyster-restoration project from their classroom and learn about the Chesapeake Bay through direct observation, data, and hands-on activities.
+    </p>
+    </div>
+</section>
+
+<section class="story-section reveal">
+    <span class="small">The Inspiration</span>
+    <div class="text-box">
+    <h2>And then, a bill.</h2>
+    <p>
+        Rob Witmann and other lawmakers introduced the proposed, bipartisan SHELLS Act in 2023 to support aquaculture, including oysters.
+        This proposed legislation drove us to create Ostrea by inspiring us to consider the Chesapeake Bay and its oysters as key dependents of conservation efforts.
+        <p class="py-4" style="margin-left: 2em;">
+            "In Virginia's First District, aquaculture is agriculture. ... Not only is it an essential part of our economy, but it is critical to improving the health of Virginia's waters. Aquaculture farmers and harvesters will continue to play an increasingly significant role in meeting our country's growing demand for sustainable, healthy seafood, and the SHELLS Act will help the USDA meet that demand."
+            - Rob Witmann, 2023
+        </p>
+        Source: <a href="https://wittman.house.gov/newsroom/press-releases/wittman-bonamici-pallone-pingree-introduce-bipartisan-bill-to-support-aquaculture-farmers-and-harvesters">Press Release from the Office of Rob Wittman</a>
+    </p>
+    </div>
+</section>
+
+<section class="story-section reveal">
+    <span class="small">The Heart</span>
+    <div class="text-box">
+    <h2>The "Adoption" Program</h2>
+    <p>
+        The heart of Ostrea is a classroom "adoption" program centered around a real oyster cage hosted by our partner organization, the Tidewater Oyster Gardeners Association (TOGA) and its Oyster Master Gardeners. Students will follow the oysters throughout a short program through photographs, field observations, and data such as growth stage, water temperature, and site conditions. The website will connect these observations to lessons about oysters, ecosystems, water quality, and Chesapeake Bay restoration, allowing students to see how what they learn in the classroom relates to a real ecosystem.
+    </p>
+    </div>
+</section>
+
+<section class="story-section reveal">
+    <span class="small">The Goal</span>
+    <div class="text-box">
+    <h2>What's our intended impact?</h2>
+    <p>
+        Our mission is to make Chesapeake Bay restoration something that Henrico students can actively participate in, rather than simply learn about from a textbook. Through Ostrea, we hope to give students a direct connection to the Bay while introducing them to environmental science, data collection, and community-based restoration. We want to show students that they can contribute to protecting the Chesapeake Bay, even from miles away.
+    </p>
+    </div>
+</section>
+
+<section class="story-section reveal">
+    <span class="small">The Source of Data</span>
+    <div class="text-box">
+    <h2>Where did we get our data from?</h2>
+    <p>
+        Before we cover some of the oyster data, we would like to credit our partner organization, the Tidewater Oyster Gardeners Association (TOGA),
+        for providing us with all of the data used in Ostrea.
+        Here, enjoy some images of the setup used by Gregory Jesseman, an oyster gardener at TOGA, who also provided us with these photos.
+    </p>
+    <p>
+        <table class="min-w-full border-collapse border border-gray-300 bg-white dark:bg-gray-900">
+            <tbody>
+            <tr class="hover:bg-gray-200 dark:hover:bg-gray-950 transition-colors">
+                <td scope="row" class="border border-gray-300 p-4" style="width: 50%;">
+                <figure>
+                    <img src="{% static 'img/oyster-setup-1.jpeg' %}" width="100"></img>
+                    <figcaption>This image depicts 20 spat in a spat bag, a refractometer (to measure the water's salinity), calipers (to get oyster measurements in metric), and a Fahrenheit temperature gauge (to measure the water temperature).</figcaption>
+                </figure>
+                </td>
+                <td class="border border-gray-300 p-4" style="width: 50%;">
+                <figure>
+                    <img src="{% static 'img/oyster-setup-2.jpeg' %}" width="150"></img>
+                    <figcaption>This image depicts spat being measured inside of the spat bag.</figcaption>
+                </figure>
+                </td>
+            </tr>
+
+            <tr class="hover:bg-gray-200 dark:hover:bg-gray-950 transition-colors">
+                <td scope="row" class="border border-gray-300 p-4">
+                <figure>
+                    <img src="{% static 'img/oyster-setup-3.jpeg' %}" width="100"></img>
+                    <figcaption>This image depicts the 20 measured spat back in the spat bag before being inserted back into the water.</figcaption>
+                </figure>
+                </td>
+                <td class="border border-gray-300 p-4">
+                <figure>
+                    <img src="{% static 'img/oyster-setup-4.jpeg' %}" width="100"></img>
+                    <figcaption>This image depicts the finished data sheet, with water temperature (60°F), salinity (17 grams of salt per liter of water), and the spat measurements in millimeters.</figcaption>
+                </figure>
+                </td>
+            </tr>
+            <tr class="hover:bg-gray-200 dark:hover:bg-gray-950 transition-colors">
+                <td scope="row" class="border border-gray-300 p-4">
+                <figure>
+                    <img src="{% static 'img/oyster-setup-5.jpeg' %}" width="100"></img>
+                    <figcaption>This image depicts the 20 measured spat back in the oyster float.</figcaption>
+                </figure>
+                </td>
+                <td class="border border-gray-300 p-4">
+                <figure>
+                    <img src="{% static 'img/oyster-setup-6.jpeg' %}" width="150"></img>
+                    <figcaption>This image depicts the oyster float back in the water with all 20 measured spat.</figcaption>
+                </figure>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </p>
+    </div>
+</section>
+
+<section class="story-section reveal">
+    <span class="small">The Population Data</span>
+    <div class="text-box">
+    <h2>How did the population change over time?</h2>
+    <p>
+        All dates are in MM/DD/YYYY format.
+        <br><br>
+        Source for Data Points: Brian Moran (Oyster Gardener at TOGA)
+        <canvas id="populationChart"></canvas>
+    </p>
+    </div>
+</section>
+
+<section class="story-section reveal">
+    <span class="small">The Size Data</span>
+    <div class="text-box">
+    <h2>How did the highest and lowest diameter change over time?</h2>
+    <p>
+        All dates are in MM/DD/YYYY format.
+        The y-positions are irrelevant; they have just been used to give spacing between largest and smallest diameter.
+        <br><br>
+        Source for Data Points: Brian Moran (Oyster Gardener at TOGA)
+        <canvas id="diameterChart" height="90"></canvas>
+    </p>
+    </div>
+</section>
+
+</main>
+
+<footer class="outro">
+    <h2>Thanks for exploring Ostrea!</h2>
+    <p>We hope you learned something new.
+
+        {% if not request.user.is_authenticated %}
+        <p class="remove-for-non-staff">If you're a student, continue your journey with Ostrea by clicking <a class="text-blue-600 underline" href="/dashboard/">here</a>.</p>
+        {% endif %}
+    </p>
+</footer>
 {% endblock content %}
 
 {% block extrabody %}
 <script>
     const db = makeStandardDatabaseObject();
     db.connect();
+
+    const sections = document.querySelectorAll(".reveal");
+
+    const observer = new IntersectionObserver(
+      (entries, observer) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("visible");
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      {
+        threshold: 0.15,
+        rootMargin: "0px 0px -40px 0px"
+      }
+    );
+
+    sections.forEach((section) => {
+      observer.observe(section);
+    });
+    
+    new Chart(
+        document.getElementById("populationChart").getContext("2d"),
+        {
+            type: "line",
+            data:
+                {
+                    labels: ["5/15/2026", "6/16/2026", "7/25/2026", "8/7/2026", "8/26/2026", "9/11/2026", "10/7/2026"],
+                    datasets: [
+                        {
+                            label: "Population Count",
+                            data: [459, 458, 378, 375, 377, 375, 354],
+                            borderColor: "#3498db",
+                            backgroundColor: "rgba(52, 152, 219, 0.2)",
+                            borderWidth: 3,
+                            tension: 0,
+                            fill: true
+                        },
+                        {
+                            label: "Mortality",
+                            data: [0, 1, 3, 3, 5, 2, 5],
+                            borderColor: "#fc3a3a",
+                            backgroundColor: "rgba(247, 82, 82, 0.2)",
+                            borderWidth: 3,
+                            tension: 0,
+                            fill: true
+                        }
+                    ]
+                },
+            options: {
+                responsive: true,
+            }
+        }
+    );
+
+    new Chart(
+        document.getElementById("diameterChart").getContext("2d"),
+        {
+            type: 'bubble',
+            data: {
+                datasets: [
+                    {
+                        label: "Largest Diameter",
+                        data: [
+                            { x: 0, y: .31, r: 2 },
+                            { x: 1, y: .31, r: 2.375 },
+                            { x: 2, y: .31, r: 2.375 },
+                            { x: 3, y: .31, r: 2.375 }
+                        ],
+                        backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        borderWidth: 1
+                    },
+                    {
+                        label: "Smallest Diameter",
+                        data: [
+                            { x: 0, y: .3, r: 1 },
+                            { x: 1, y: .3, r: 0.75 },
+                            { x: 2, y: .3, r: 1.25 },
+                            { x: 3, y: .3, r: 1.25 }
+                        ],
+                        backgroundColor: 'rgba(255, 0, 100, 0.5)',
+                        borderColor: 'rgba(255, 0, 100, 1)',
+                        borderWidth: 1
+                    },
+                ]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            title: function(context) {
+                                const tooltipItem = context[0];
+                                return tooltipItem.chart.scales.x.getLabelForValue(tooltipItem.raw.x);
+                            },
+
+                            label: function(context) {
+                                const dataPoint = context.raw;
+                                const datasetName = context.dataset.label || '';
+                                
+                                return [
+                                    `${datasetName}`,
+                                    `Size: ${dataPoint.r} in`,
+                                ];
+                            }
+                        }
+                    }},
+                scales: {
+                    x: {
+                        type: "category",
+                        labels: ["8/7/2026", "8/26/2026", "9/11/2026", "10/7/2026"],
+                        title: {
+                            display: true,
+                            text: "Date"
+                        }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: ""
+                        },
+                        ticks: {
+                            display: false 
+                        },
+                        min: 0.296,
+                        max: 0.313,
+                    }
+                }
+            }
+        }
+    )
 </script>
 {% endblock extrabody %}

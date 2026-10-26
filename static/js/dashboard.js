@@ -157,6 +157,12 @@ const ARTICLE_KEYWORDS = {
     "RES:SURVIVAL_KIT": `<iframe src="/static/misc/oyster-survival-kit.pdf" title="Oyster Survival Kit" class="w-full max-w-5xl min-h-[85vh]"></iframe>`,
     "GAME:CHESAPEAKE_FOOD_WEB": `<iframe src="/games/chesapeake-food-web/" title="Chesapeake Food Web" class="w-full max-w-5xl min-h-[85vh]"></iframe>`,
     "INTERACTIVE:GUESS_THE_ORGANISM": `<iframe src="https://docs.google.com/presentation/d/e/2PACX-1vShwfENk-1ePxdthNnTJltsE1e5hxgz_zdzU5UI0M7O4GW2dz2EflJtnSnPqn_dHFgJdv-wjscs_QuW/pubembed?start=false&loop=false&delayms=3000" frameborder="0" width="480" height="299" allowfullscreen="true" mozallowfullscreen="true" webkitallowfullscreen="true"></iframe>`,
+    "INTERACTIVE:BAY_GAME": `<iframe src="/games/bay-game/" title="Bay Game" class="w-full max-w-5xl min-h-[85vh]"></iframe>`,
+    "INTERACTIVE:HISTORY_GAME": `<iframe src="/games/history-game/" title="History Game" class="w-full max-w-5xl min-h-[85vh]"></iframe>`,
+    "INTERACTIVE:OYSTER_GARDEN": `<iframe src="/games/oyster-garden/" title="Oyster Garden" class="w-full max-w-5xl min-h-[85vh]"></iframe>`,
+    "INTERACTIVE:RESTORATION_GAME": `<iframe src="/games/restoration-game/" title="Restoration Game" class="w-full max-w-5xl min-h-[85vh]"></iframe>`,
+    "INTERACTIVE:CAUSE_EFFECT": `<iframe src="/games/cause-effect/" title="Oyster Cause & Effect" class="w-full max-w-5xl min-h-[85vh]"></iframe>`,
+    "INTERACTIVE:OYSTER_SCI_FLASHCARDS": `<iframe src="/games/oyster-science-flashcards/" title="Oyster Science Flashcards" class="w-full max-w-5xl min-h-[85vh]"></iframe>`,
 }
 
 async function buildDOM(){
@@ -252,7 +258,6 @@ async function buildDOM(){
             if (units.length === 0){
                 subContainerDiv.insertAdjacentHTML("beforeend", "<p class='pt-4'>Lessons coming soon!</p>")
             } else {
-                units = [units[0], units[1]];
                 for (var i = 0; i < units.length; i ++){
                     let desc = units[i].description || "No description provided.";
                     let lessonCount = (await fetchAPI(`/api/lessons/get-lessons-in-unit?unit_id=${units[i].id}`)).length;

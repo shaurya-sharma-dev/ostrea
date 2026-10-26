@@ -63,3 +63,33 @@ def habitat_survival(request):
 @xframe_options_sameorigin
 def chesapeake_food_web(request):
     return render(request, "core/games/chesapeake-food-web.html")
+
+@no_csrf
+@xframe_options_sameorigin
+def bay_game(request):
+    return render(request, "core/games/bay-game.html")
+
+@no_csrf
+@xframe_options_sameorigin
+def history_game(request):
+    return render(request, "core/games/history-game.html")
+
+@no_csrf
+@xframe_options_sameorigin
+def oyster_garden(request):
+    return render(request, "core/games/oyster-garden.html")
+
+@no_csrf
+@xframe_options_sameorigin
+def restoration_game(request):
+    return render(request, "core/games/restoration-game.html")
+
+@no_csrf
+@xframe_options_sameorigin
+def oyster_science_flashcards(request):
+    return render(request, "core/games/oyster-sci-flashcards.html")
+
+@no_csrf
+@xframe_options_sameorigin
+def cause_effect(request):
+    return render(request, "core/games/cause-effect.html")

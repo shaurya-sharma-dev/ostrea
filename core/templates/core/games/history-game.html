@@ -1,0 +1,490 @@
+{% extends "core/bare-base.html" %}
+{% load static %}
+
+{% comment "License" %}
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at http://mozilla.org/MPL/2.0/.
+{% endcomment %}
+
+{% block extrahead %}
+<script src="{% static 'js/chart.js' %}"></script>
+<style>
+    :root {
+    --bg: #0b2025;
+    --fg: #e2f5f4;
+    --card: #102f34;
+    --muted: #b2d8d6;
+    --accent: #5cdcd5;
+    --bar: #a9c3cf;
+    --line: #2bb6af;
+    --good: #2e8b57;
+    --bad: #c0392b;
+    box-sizing: border-box;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    }
+    @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+        color-scheme: dark;
+        --bg: #0b2025;
+        --fg: #e2f5f4;
+        --card: #102f34;
+        --muted: #9bb5c1;
+        --accent: #5cdcd5;
+        --bar: #3d5866;
+        --line: #2bb6af;
+        --good: #5cc98a;
+        --bad: #ef7b6e;
+    }
+    }
+    :root[data-theme="dark"] {
+    color-scheme: dark;
+    --bg: #0b2025;
+    --fg: #e2f5f4;
+    --card: #102f34;
+    --muted: #9bb5c1;
+    --accent: #5cdcd5;
+    --bar: #3d5866;
+    --line: #2bb6af;
+    --good: #5cc98a;
+    --bad: #ef7b6e;
+    }
+    html {
+    scroll-padding-top: env(safe-area-inset-top, 0px);
+    }
+    body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--fg);
+    font:
+        17px/1.5 system-ui,
+        -apple-system,
+        "Segoe UI",
+        sans-serif;
+    }
+    .wrap {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 16px;
+    }
+    h1 {
+    color: #5cdcd5;
+    font-size: 1.6rem;
+    margin: 0.1em 0 0.3em;
+    }
+    .stats {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 10px;
+    }
+    .stats div {
+    flex: 1;
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 6px 10px;
+    text-align: center;
+    font-size: 0.85rem;
+    color: var(--muted);
+    }
+    .stats b {
+    display: block;
+    font-size: 1.25rem;
+    color: var(--fg);
+    }
+    .card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 12px 16px;
+    margin: 10px 0;
+    }
+    .pick {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+    }
+    .pick button,
+    .btn {
+    background: #164e54;
+    color: #e2f5f4;
+    border: 1px solid #2bb6af;
+    font: inherit;
+    font-weight: 700;
+    padding: 14px 10px;
+    border: 2px solid var(--accent);
+    border-radius: 12px;
+    background: var(--card);
+    color: var(--fg);
+    cursor: pointer;
+    min-height: 48px;
+    }
+    .pick button {
+    background: #164e54;
+    color: #e2f5f4;
+    border: 1px solid #2bb6af;
+    flex: 1;
+    font-size: 1.15rem;
+    }
+    .pick button:hover {
+    background: rgba(11, 110, 138, 0.12);
+    }
+    .btn {
+    background: #164e54;
+    color: #e2f5f4;
+    border: 1px solid #2bb6af;
+    background: var(--accent);
+    color: #fff;
+    border-color: var(--accent);
+    padding: 10px 18px;
+    }
+    .plot {
+    position: relative;
+    height: 210px;
+    }
+    .good {
+    color: var(--good);
+    }
+    .bad {
+    color: var(--bad);
+    }
+    .src {
+    font-size: 0.8rem;
+    color: var(--muted);
+    }
+
+    button:hover,
+    .btn:hover {
+    background: #1d5f66;
+    }
+    a {
+    color: #5cdcd5;
+    }
+    .src a {
+    color: #5cdcd5;
+    text-decoration: underline;
+    }
+</style>
+{% endblock extrahead %}
+
+{% block content %}
+<div class="wrap">
+    <h1>Oyster Time Detective</h1>
+    <div class="stats">
+    <div>Round<b id="rd">1 of 8</b></div>
+    <div>Score<b id="sc">0</b></div>
+    <div>Streak<b id="st">0</b></div>
+    </div>
+    <div class="card">
+    <p style="margin: 0; font-weight: 700">
+        Which year did Virginia take more oysters from its waters?
+    </p>
+    <div class="pick" id="pick"></div>
+    </div>
+    <div class="card" id="res" hidden>
+    <p id="fb" style="margin: 0 0 6px"></p>
+    <div class="plot">
+        <canvas
+        id="ch"
+        role="img"
+        aria-label="Two bars comparing oysters taken in two years"
+        ></canvas>
+    </div>
+    <div id="facts"></div>
+    <div style="margin-top: 10px" id="act"></div>
+    </div>
+    <p class="src">
+    The bars show oysters people took out of the water, called harvest or
+    landings, in bushels. They are not counts of oysters living in the Bay.
+    Sources:
+    <a
+        href="https://doi.org/10.3389/fmars.2017.00094"
+        target="_blank"
+        rel="noopener noreferrer"
+        >Schulte 2017, Frontiers in Marine Science</a
+    >;
+    <a href="https://www.mrc.virginia.gov/"
+        >Virginia Marine Resources Commission oyster ground production
+        table</a
+    >; <a href="https://www.vims.edu/">Hargis and Haven, VIMS</a>.
+    </p>
+</div>
+{% endblock content %}
+
+{% block extrabody %}
+<script>
+var D = [
+{
+    y: "1849",
+    v: 178000,
+    s: "Oysters were fished lightly. About 178,000 bushels were taken.",
+},
+{
+    y: "1859",
+    v: 2300000,
+    s: "Big boats arrived from New England and canning grew. About 2.3 million bushels were taken.",
+},
+{
+    y: "1904",
+    v: 7600000,
+    s: "Virginia took about 7.6 million bushels, and shell was getting scarce.",
+},
+{
+    y: "1957 season",
+    v: 3513054,
+    s: "About 3.5 million bushels were landed, mostly from private oyster beds.",
+},
+{
+    y: "1961 season",
+    v: 2042922,
+    s: "Landings dropped fast as the oyster disease MSX spread.",
+},
+{
+    y: "1972 season",
+    v: 552011,
+    s: "Tropical Storm Agnes flooded the Bay with fresh water. Oysters need salt.",
+},
+{
+    y: "1980 season",
+    v: 1177313,
+    s: "A short rebound brought landings back above one million bushels.",
+},
+{
+    y: "1989 season",
+    v: 162618,
+    s: "Disease, overharvesting and lost reef habitat had wiped out most landings.",
+},
+{
+    y: "1995 season",
+    v: 17691,
+    s: "The lowest season in the state record from 1957 to 2002.",
+},
+{
+    y: "2001 season",
+    v: 31166,
+    s: "Less than 1 out of every 100 bushels landed in 1957.",
+},
+];
+var cs = getComputedStyle(document.documentElement);
+function tok(n) {
+return cs.getPropertyValue(n).trim();
+}
+function $(id) {
+return document.getElementById(id);
+}
+function shuffle(a) {
+for (var i = a.length - 1; i > 0; i--) {
+    var j = Math.floor(Math.random() * (i + 1)),
+    t = a[i];
+    a[i] = a[j];
+    a[j] = t;
+}
+return a;
+}
+function tick(v) {
+return v >= 1000000
+    ? v / 1000000 + " million"
+    : v >= 1000
+    ? v / 1000 + "k"
+    : v;
+}
+var pairs,
+round,
+score,
+streak,
+right,
+chart = null,
+cur;
+function makePairs() {
+var out = [],
+    seen = {};
+while (out.length < 8) {
+    var a = Math.floor(Math.random() * D.length),
+    b = Math.floor(Math.random() * D.length);
+    var key = Math.min(a, b) + "-" + Math.max(a, b);
+    if (a !== b) {
+    if (!seen[key]) {
+        seen[key] = 1;
+        out.push(Math.random() < 0.5 ? [a, b] : [b, a]);
+    }
+    }
+}
+return out;
+}
+function stats() {
+$("rd").textContent = Math.min(round + 1, 8) + " of 8";
+$("sc").textContent = score;
+$("st").textContent = streak;
+}
+function start() {
+pairs = makePairs();
+round = 0;
+score = 0;
+streak = 0;
+right = 0;
+next();
+}
+function next() {
+cur = pairs[round];
+stats();
+$("res").hidden = true;
+$("pick").innerHTML = "";
+cur.forEach(function (idx) {
+    var b = document.createElement("button");
+    b.textContent = D[idx].y;
+    b.addEventListener("click", function () {
+    answer(idx);
+    });
+    $("pick").appendChild(b);
+});
+$("pick").style.display = "flex";
+}
+function answer(idx) {
+var a = D[cur[0]],
+    b = D[cur[1]],
+    win = a.v > b.v ? cur[0] : cur[1],
+    ok = idx === win;
+$("pick").style.display = "none";
+if (ok) {
+    streak++;
+    right++;
+    var pts = 10 + (streak > 1 ? 2 : 0);
+    score += pts;
+    $("fb").innerHTML =
+    '<b class="good">Correct! +' +
+    pts +
+    " points.</b> " +
+    D[win].y +
+    " had more.";
+} else {
+    streak = 0;
+    $("fb").innerHTML =
+    '<b class="bad">Not this time.</b> ' + D[win].y + " had more.";
+}
+$("res").hidden = false;
+$("facts").innerHTML = cur
+    .map(function (i) {
+    return (
+        "<p style='margin:6px 0'><b>" +
+        D[i].y +
+        ":</b> " +
+        D[i].v.toLocaleString("en-US") +
+        " bushels. " +
+        D[i].s +
+        "</p>"
+    );
+    })
+    .join("");
+var cols = cur.map(function (i) {
+    return i === win ? tok("--good") : tok("--bar");
+});
+var data = {
+    labels: cur.map(function (i) {
+    return D[i].y;
+    }),
+    datasets: [
+    {
+        data: cur.map(function (i) {
+        return D[i].v;
+        }),
+        backgroundColor: cols,
+        borderRadius: 6,
+    },
+    ],
+};
+if (chart === null) {
+    chart = new Chart($("ch"), {
+    type: "bar",
+    data: data,
+    options: {
+        maintainAspectRatio: false,
+        plugins: {
+        legend: { display: false },
+        tooltip: {
+            callbacks: {
+            label: function (x) {
+                return x.parsed.y.toLocaleString("en-US") + " bushels";
+            },
+            },
+        },
+        },
+        scales: {
+        y: { beginAtZero: true, ticks: { callback: tick } },
+        x: { grid: { display: false } },
+        },
+    },
+    });
+} else {
+    chart.data = data;
+}
+chart.options.scales.y.ticks.color = tok("--muted");
+chart.options.scales.x.ticks.color = tok("--fg");
+chart.options.scales.y.grid.color = tok("--line");
+chart.resize();
+chart.update();
+$("act").innerHTML = "";
+var n = document.createElement("button");
+n.className = "btn";
+n.textContent = round === 7 ? "See my results" : "Next";
+n.addEventListener("click", function () {
+    round++;
+    if (round > 7) {
+    finish();
+    } else {
+    next();
+    }
+});
+$("act").appendChild(n);
+stats();
+}
+function finish() {
+var stars = right >= 7 ? 3 : right >= 5 ? 2 : 1;
+$("res").hidden = false;
+$("pick").style.display = "none";
+$("fb").innerHTML =
+    "Case closed, detective! You scored <b>" +
+    score +
+    "</b> points and got " +
+    right +
+    " of 8 right. " +
+    "★".repeat(stars) +
+    "☆".repeat(3 - stars);
+$("facts").innerHTML =
+    "<p style='margin:6px 0'>The big story: oysters were taken faster and faster, then disease, lost reef habitat and poor water quality pushed harvests way down. Today hatcheries, oyster farms and restoration are helping oysters return.</p>";
+$("act").innerHTML = "";
+var b = document.createElement("button");
+b.className = "btn";
+b.textContent = "Play again";
+b.addEventListener("click", start);
+$("act").appendChild(b);
+$("ch").parentNode.style.display = "none";
+parent.postMessage(
+    {
+    type: "ostrea-score",
+    game: "oyster-time-detective",
+    score: score,
+    max: 94,
+    },
+    "*",
+);
+}
+var oldNext = next;
+next = function () {
+$("ch").parentNode.style.display = "block";
+oldNext();
+};
+start();
+function sendHeight() {
+parent.postMessage(
+    {
+    type: "ostrea-height",
+    height: document.documentElement.scrollHeight,
+    },
+    "*",
+);
+}
+addEventListener("load", sendHeight);
+new ResizeObserver(sendHeight).observe(document.body);
+</script>
+{% endblock extrabody %}

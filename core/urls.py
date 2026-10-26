@@ -12,6 +12,15 @@ urlpatterns = [
     path('games/anatomy-chatbot/', views.anatomy_chatbot, name="anatomy_chatbot"),
     path('games/chesapeake-food-web/', views.chesapeake_food_web, name="chesapeake_food_web"),
     path('games/habitat-survival/', views.habitat_survival, name="habitat_survival"),
+
+    path('games/bay-game/', views.bay_game, name="bay_game"),
+    path('games/history-game/', views.history_game, name="history_game"),
+    path('games/oyster-garden/', views.oyster_garden, name="oyster_garden"),
+    path('games/restoration-game/', views.restoration_game, name="restoration_game"),
+
+    path('games/oyster-science-flashcards/', views.oyster_science_flashcards, name="oyster_science_flashcards"),
+    path('games/cause-effect/', views.cause_effect, name="cause_effect"),
+
     path('dashboard/', views.dashboard, name="dashboard"),
     path('', views.index, name="home"),
 ]

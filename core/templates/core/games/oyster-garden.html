@@ -1,0 +1,807 @@
+{% extends "core/bare-base.html" %}
+{% load static %}
+
+{% comment "License" %}
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at http://mozilla.org/MPL/2.0/.
+{% endcomment %}
+
+{% block extrahead %}
+<style>
+    :root {
+    --bg: #0b2025;
+    --fg: #e2f5f4;
+    --muted: #b2d8d6;
+    --accent: #5cdcd5;
+    box-sizing: border-box;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    }
+    @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+        color-scheme: dark;
+        --bg: #0b2025;
+        --fg: #e2f5f4;
+        --muted: #9bb5c1;
+        --accent: #4fc0dc;
+    }
+    }
+    :root[data-theme="dark"] {
+    color-scheme: dark;
+    --bg: #0b2025;
+    --fg: #e2f5f4;
+    --muted: #9bb5c1;
+    --accent: #4fc0dc;
+    }
+    html {
+    scroll-padding-top: env(safe-area-inset-top, 0px);
+    }
+    body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--fg);
+    font:
+        17px/1.5 system-ui,
+        -apple-system,
+        "Segoe UI",
+        sans-serif;
+    }
+    .wrap {
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 16px;
+    }
+    h1 {
+    color: #5cdcd5;
+    font-size: 1.7rem;
+    margin: 0.2em 0 0.1em;
+    }
+    .sub {
+    color: var(--muted);
+    margin: 0 0 12px;
+    }
+    .term {
+    background: #0d1b24;
+    color: #d7e9f0;
+    border-radius: 14px;
+    padding: 12px;
+    border: 1px solid #28414f;
+    }
+    #out {
+    font:
+        13px/1.35 ui-monospace,
+        "SF Mono",
+        Menlo,
+        Consolas,
+        monospace;
+    white-space: pre-wrap;
+    overflow-x: auto;
+    overflow-y: auto;
+    min-height: 340px;
+    max-height: 520px;
+    margin: 0;
+    }
+    #quick {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 10px 0 0;
+    }
+    #quick button {
+    background: #164e54;
+    color: #e2f5f4;
+    border: 1px solid #2bb6af;
+    font: inherit;
+    font-size: 1rem;
+    min-width: 48px;
+    min-height: 44px;
+    padding: 6px 14px;
+    border-radius: 10px;
+    border: 1px solid #3b5d6e;
+    background: #16303d;
+    color: #e6f1f5;
+    cursor: pointer;
+    }
+    #quick button:hover {
+    background: #1f4455;
+    }
+    #form {
+    display: flex;
+    gap: 8px;
+    margin-top: 10px;
+    }
+    #inp {
+    flex: 1;
+    min-width: 0;
+    font:
+        16px ui-monospace,
+        Menlo,
+        Consolas,
+        monospace;
+    padding: 8px 10px;
+    border-radius: 10px;
+    border: 1px solid #3b5d6e;
+    background: #0a141b;
+    color: #e6f1f5;
+    }
+    #form button {
+    background: #164e54;
+    color: #e2f5f4;
+    border: 1px solid #2bb6af;
+    font: inherit;
+    padding: 8px 14px;
+    border-radius: 10px;
+    border: 0;
+    background: #2a8fb0;
+    color: #fff;
+    font-weight: 700;
+    cursor: pointer;
+    }
+    .cyan {
+    color: #5fd7e6;
+    }
+    .blue {
+    color: #6aa7ff;
+    }
+    .green {
+    color: #6fdc8c;
+    }
+    .yellow {
+    color: #f5d76e;
+    }
+    .pink {
+    color: #ff8fd0;
+    }
+    .red {
+    color: #ff7a7a;
+    }
+    .bold {
+    font-weight: 700;
+    color: #fff;
+    }
+    .dim {
+    color: #7f97a3;
+    }
+
+    button:hover,
+    .btn:hover {
+    background: #1d5f66;
+    }
+    a {
+    color: #5cdcd5;
+    }
+    .src a {
+    color: #5cdcd5;
+    text-decoration: underline;
+    }
+</style>
+{% endblock extrahead %}
+
+{% block content %}
+<div class="wrap">
+    <h1>Virtual Oyster Garden</h1>
+    <p class="sub">Type a number and press Enter, or tap a button.</p>
+    <div class="term">
+    <pre id="out" aria-live="polite"></pre>
+    <div id="quick"></div>
+    <form id="form" autocomplete="off">
+        <input id="inp" aria-label="Type here" enterkeyhint="send" /><button
+        type="submit"
+        >
+        Enter
+        </button>
+    </form>
+    </div>
+</div>
+{% endblock content %}
+
+{% block extrabody %}
+<script>
+var out = document.getElementById("out"),
+form = document.getElementById("form"),
+inp = document.getElementById("inp"),
+quick = document.getElementById("quick");
+var WEEKS = 8,
+MONTHS = [
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+],
+TEMPS = [16, 20, 24, 27, 28, 25, 20, 14];
+var pending = null;
+function c(t, k) {
+return [t, k];
+}
+function L() {
+return Array.prototype.slice.call(arguments).map(function (a) {
+    return typeof a === "string" ? [a, ""] : a;
+});
+}
+function put(parts) {
+parts.forEach(function (p) {
+    var s = document.createElement("span");
+    if (p[1]) {
+    s.className = p[1];
+    }
+    s.textContent = p[0];
+    out.appendChild(s);
+});
+out.appendChild(document.createTextNode("\n"));
+out.scrollTop = out.scrollHeight;
+}
+function say() {
+put(L.apply(null, arguments));
+}
+function submit(v) {
+if (!pending) {
+    return;
+}
+var r = pending;
+pending = null;
+quick.innerHTML = "";
+put(L(c("> " + v, "dim")));
+r(v);
+}
+form.addEventListener("submit", function (e) {
+e.preventDefault();
+submit(inp.value.trim());
+});
+function waitInput(valid) {
+return new Promise(function (res) {
+    quick.innerHTML = "";
+    if (valid) {
+    valid.forEach(function (v) {
+        var b = document.createElement("button");
+        b.type = "button";
+        b.textContent = v;
+        b.addEventListener("click", function () {
+        submit(v);
+        });
+        quick.appendChild(b);
+    });
+    }
+    pending = res;
+    inp.value = "";
+    inp.focus({ preventScroll: true });
+});
+}
+async function ask(prompt, valid) {
+while (true) {
+    say(c(prompt, "bold"));
+    var a = (await waitInput(valid)).toLowerCase();
+    if (valid.indexOf(a) >= 0) {
+    return a;
+    }
+    say("   Please type one of: " + valid.join(", "));
+}
+}
+async function pause() {
+say(c("   (press Enter to continue)", "dim"));
+await waitInput(["Continue"]);
+}
+function rnd(a, b) {
+return a + Math.floor(Math.random() * (b - a + 1));
+}
+function shuffle(a) {
+for (var i = a.length - 1; i > 0; i--) {
+    var j = rnd(0, i),
+    t = a[i];
+    a[i] = a[j];
+    a[j] = t;
+}
+return a;
+}
+function newGarden(name) {
+return {
+    name: name,
+    oysters: 50,
+    size: 15,
+    fouling: 10,
+    depth: "shallow",
+    salinity: 14,
+    temp: 16,
+    oxygen: 8,
+    knownCount: 50,
+    knownSize: 15,
+    countedWeek: 1,
+    checks: 0,
+    measures: 0,
+    scrubs: 0,
+    wildlife: 0,
+    helped: false,
+    gallons: 0,
+    ap: 2,
+};
+}
+function art(g) {
+var side =
+    g.fouling <= 35
+    ? "|"
+    : g.fouling <= 60
+        ? c("%", "yellow")
+        : c("%", "red");
+var oy = g.oysters > 25 ? c("(o)", "pink") : c("(-)", "dim");
+var fish = c("<><", "yellow");
+var rows = [
+    L(c("~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~", "blue")),
+    L(c("==[ DOCK ]==============", "yellow")),
+    L("      ||      ", c("o", "cyan")),
+];
+if (g.depth === "deep") {
+    rows.push(L("      ||   ", c("O", "cyan")));
+    rows.push(L("      ||"));
+}
+rows.push(L("   .--++--.   ", c("o", "cyan"), "   ", fish));
+rows.push(L("   ", side, oy, oy, side, "   ", c("O", "cyan")));
+rows.push(L("   ", side, oy, oy, side, "       ", fish));
+rows.push(L("   '------'"));
+if (g.fouling > 35) {
+    rows.push(L(c("   (barnacles are growing on the cage!)", "yellow")));
+}
+rows.push(L(c("  .  _  ., .  _ ,  .  _ .  ,", "dim")));
+return rows;
+}
+function header(g, week) {
+say("");
+say(c("=".repeat(46), "cyan"));
+say(
+    c(
+    "  OYSTER GARDEN   Week " +
+        week +
+        " of " +
+        WEEKS +
+        "   (" +
+        MONTHS[week - 1] +
+        ")",
+    "bold",
+    ),
+);
+say(c("=".repeat(46), "cyan"));
+art(g).forEach(put);
+say("");
+say(
+    "  Oysters: about " +
+    g.knownCount +
+    " (counted in week " +
+    g.countedWeek +
+    ")   Size: " +
+    Math.round(g.knownSize) +
+    " mm",
+);
+say("  Cage is hanging: " + g.depth + "    Action points: " + g.ap);
+}
+function checkWater(g) {
+g.checks++;
+say("");
+say(c("  Water check!", "cyan"));
+say(
+    "  Salt:    " + g.salinity + " ppt   ",
+    g.salinity >= 10
+    ? g.salinity <= 25
+        ? c("good", "green")
+        : c("not good", "red")
+    : c("not good", "red"),
+);
+say(
+    "  Warmth:  " + g.temp + " C     ",
+    g.temp < 27 ? c("good", "green") : c("hot!", "red"),
+);
+say(
+    "  Oxygen:  " + g.oxygen.toFixed(1) + "     ",
+    g.oxygen >= 6 ? c("good", "green") : c("low!", "red"),
+);
+say(
+    c(
+    "  Oysters like 10 to 25 ppt salt and cool, oxygen-rich water.",
+    "dim",
+    ),
+);
+}
+function measure(g, week) {
+g.measures++;
+g.knownCount = g.oysters;
+g.knownSize = g.size;
+g.countedWeek = week;
+say("");
+say(c("  You count and measure your oysters.", "cyan"));
+say(
+    "  " +
+    g.oysters +
+    " oysters are alive, about " +
+    Math.round(g.size) +
+    " mm long.",
+);
+var lost = 50 - g.oysters;
+if (lost > 0) {
+    say(
+    "  " +
+        lost +
+        " have died so far. Writing it down helps you spot problems.",
+    );
+} else {
+    say("  All 50 are alive. Great job!");
+}
+}
+function scrub(g) {
+g.scrubs++;
+g.fouling = Math.max(0, g.fouling - 45);
+say("");
+say(
+    c(
+    "  Scrub, scrub, scrub! Water can flow through the cage again.",
+    "green",
+    ),
+);
+say(c("  Clean cages let oysters get more food and oxygen.", "dim"));
+}
+function moveCage(g) {
+g.depth = g.depth === "shallow" ? "deep" : "shallow";
+say("");
+if (g.depth === "deep") {
+    say(
+    "  You lower the cage. Deep water is cooler, and heavy rain freshens the top layer most.",
+    );
+} else {
+    say(
+    "  You raise the cage. Shallow water has more food for oysters, but it gets warmer.",
+    );
+}
+}
+var TIPS = [
+"An adult oyster can filter up to about 50 gallons of water a day. That is a lot of cleaning!",
+"Barnacles and algae block the mesh. Scrub often so water can flow through.",
+"Count your oysters now and then. You cannot fix a problem you have not noticed.",
+"Rain makes the top layer of water less salty. Deeper water stays saltier.",
+"Oyster reefs are homes for small fish, crabs and worms.",
+"Many oyster gardening programs ask gardeners to bring their grown oysters to be planted on a reef.",
+];
+function tip() {
+say("");
+say(
+    "  ",
+    c("Captain Pearl says:", "pink"),
+    " " + TIPS[rnd(0, TIPS.length - 1)],
+);
+}
+function stormA(g) {
+g.depth = "deep";
+return "You lowered the cage before the rain. The oysters stayed in salty water. Smart!";
+}
+function stormB(g) {
+if (g.depth === "shallow") {
+    g.oysters = Math.max(0, g.oysters - 8);
+    g.salinity = 8;
+    return "Fresh rain water sat on top and 8 oysters could not handle it. Oysters need salt.";
+}
+return "Your cage was already deep, so the oysters stayed safe.";
+}
+function heatA(g) {
+g.depth = "deep";
+return "The deeper water is cooler. Your oysters stay comfortable.";
+}
+function heatB(g) {
+if (g.depth === "shallow") {
+    g.oysters = Math.max(0, g.oysters - 6);
+    return "The shallow water got too hot and 6 oysters died.";
+}
+return "Your cage was deep, so it stayed cooler. Lucky!";
+}
+function crabA(g) {
+return "You patched the mesh. The little crabs could not get in.";
+}
+function crabB(g) {
+g.oysters = Math.max(0, g.oysters - 5);
+return "Crabs squeezed through a gap and ate 5 baby oysters.";
+}
+function bloomA(g) {
+g.fouling = Math.max(0, g.fouling - 30);
+g.scrubs++;
+return "You cleaned off the green slime. Oxygen can flow in again.";
+}
+function bloomB(g) {
+g.fouling = Math.min(100, g.fouling + 25);
+g.oxygen = Math.max(3.5, g.oxygen - 2);
+return "Slime clogged the cage and oxygen dropped. The oysters are stressed.";
+}
+function helperA(g) {
+g.fouling = Math.max(0, g.fouling - 30);
+g.helped = true;
+return "A neighbor helps scrub the cage! Gardens are better with a community.";
+}
+function helperB(g) {
+return "You do it all yourself. That works, but it takes more time.";
+}
+function fishA(g) {
+g.wildlife++;
+return "Tiny fish and a baby crab hide in the cage. Oysters make homes for other animals!";
+}
+function fishB(g) {
+return "You wave to the fish and keep working.";
+}
+var EVENTS = [
+{
+    t: "A big storm is coming!",
+    x: "Heavy rain will make the top water less salty.",
+    a: {
+    l: "Lower the cage (uses 1 action point)",
+    cost: true,
+    fn: stormA,
+    },
+    b: { l: "Leave it as it is", cost: false, fn: stormB },
+},
+{
+    t: "A heat wave!",
+    x: "The water is getting very warm.",
+    a: {
+    l: "Lower the cage to cooler water (uses 1 action point)",
+    cost: true,
+    fn: heatA,
+    },
+    b: { l: "Do nothing", cost: false, fn: heatB },
+},
+{
+    t: "Crab tracks on the dock!",
+    x: "Small mud crabs like to eat baby oysters.",
+    a: {
+    l: "Check and patch the mesh (uses 1 action point)",
+    cost: true,
+    fn: crabA,
+    },
+    b: { l: "Skip it", cost: false, fn: crabB },
+},
+{
+    t: "Green slime in the water!",
+    x: "An algae bloom is making the water murky.",
+    a: {
+    l: "Clean the cage right away (uses 1 action point)",
+    cost: true,
+    fn: bloomA,
+    },
+    b: { l: "Wait and see", cost: false, fn: bloomB },
+},
+{
+    t: "A neighbor waves hello!",
+    x: "They want to help with your oyster garden.",
+    a: { l: "Say yes, please!", cost: false, fn: helperA },
+    b: { l: "No thanks, I have it", cost: false, fn: helperB },
+},
+{
+    t: "Little fish are visiting!",
+    x: "Something is wiggling near the cage.",
+    a: { l: "Take a closer look", cost: false, fn: fishA },
+    b: { l: "Keep working", cost: false, fn: fishB },
+},
+];
+async function playEvent(g, ev) {
+say("");
+say(c("  EVENT: " + ev.t, "yellow"));
+say("  " + ev.x);
+say("   1) " + ev.a.l);
+say("   2) " + ev.b.l);
+var pick = await ask("  Your choice (1 or 2): ", ["1", "2"]);
+var ch = pick === "1" ? ev.a : ev.b;
+if (ch.cost) {
+    g.ap = Math.max(0, g.ap - 1);
+}
+say(c("  " + ch.fn(g), "cyan"));
+}
+function endWeek(g, week) {
+var growth = 5;
+var loss = rnd(0, 2);
+g.fouling = Math.min(100, g.fouling + rnd(10, 18));
+if (g.fouling > 60) {
+    growth *= 0.5;
+    loss += Math.max(1, Math.floor(g.oysters / 10));
+} else if (g.fouling > 35) {
+    growth *= 0.8;
+}
+growth *= g.depth === "shallow" ? 1.1 : 0.95;
+if (g.salinity < 10) {
+    loss += 4;
+}
+g.oysters = Math.max(0, g.oysters - loss);
+g.size += growth;
+g.gallons += Math.floor(g.oysters * Math.min(1, g.size / 75) * 50 * 7);
+var nxt = Math.min(week, WEEKS - 1);
+g.temp = TEMPS[nxt];
+g.salinity = rnd(13, 16);
+g.oxygen = Math.round((8 - (g.temp - 16) * 0.15) * 10) / 10;
+g.ap = 2;
+if (loss > 3) {
+    say(
+    c(
+        "  Some oysters did not make it this week. Maybe check on them?",
+        "red",
+    ),
+    );
+} else {
+    say(c("  The oysters grew a little this week.", "green"));
+}
+}
+function finalReport(g) {
+var survival = g.oysters * 2;
+var score =
+    survival * 0.6 +
+    Math.min(g.size / 50, 1) * 25 +
+    Math.min(g.checks + g.measures, 8) * 1.9;
+var stars = Math.max(1, Math.min(5, 1 + Math.floor(score / 22)));
+say("");
+say(c("=".repeat(46), "pink"));
+say(c("  FINAL GARDEN REPORT for " + g.name, "bold"));
+say(c("=".repeat(46), "pink"));
+say(
+    "  Oysters alive:       " +
+    g.oysters +
+    " of 50 (" +
+    survival +
+    " percent)",
+);
+say("  Average size:        " + Math.round(g.size) + " mm");
+say("  Water checks:        " + g.checks);
+say("  Oysters counted:     " + g.measures + " times");
+say("  Cage scrubs:         " + g.scrubs);
+say("  Animals who visited: " + g.wildlife);
+say(
+    "  Water cleaned:       about " +
+    g.gallons.toLocaleString("en-US") +
+    " gallons (a game estimate)",
+);
+say("");
+say(
+    "  Rating: ",
+    c("*".repeat(stars), "yellow"),
+    c("*".repeat(5 - stars), "dim"),
+);
+if (g.checks + g.measures < 3) {
+    say(
+    "  Tip: checking the water and counting oysters more often helps you catch trouble early.",
+    );
+}
+if (g.scrubs < 3) {
+    say("  Tip: scrubbing the cage gives oysters more food and oxygen.");
+}
+if (g.helped) {
+    say(
+    "  Your neighbor helped out. Community support makes oyster gardens stronger!",
+    );
+}
+if (g.oysters >= 35) {
+    say("  Your oysters are healthy and ready to be planted on a reef!");
+} else if (g.oysters > 0) {
+    say(
+    "  Some oysters made it. Every gardener learns something new each season.",
+    );
+} else {
+    say(
+    "  The garden did not make it this time. Try again with new ideas!",
+    );
+}
+say("");
+say(c("  How gardeners help the Bay:", "cyan"));
+say(
+    "  Oyster gardeners raise young oysters in cages. In many programs, the grown",
+);
+say(
+    "  oysters are planted on reefs. Neighbors, schools and clubs each take care of",
+);
+say(
+    "  a few cages, and together they help bring oysters back to the Chesapeake Bay.",
+);
+say("");
+say("  ", c("Thank you for gardening, " + g.name + "!", "pink"));
+
+parent.postMessage(
+    {
+    type: "ostrea-score",
+    game: "oyster-garden",
+    score: Math.round(score),
+    max: 100,
+    },
+    "*",
+);
+}
+async function play() {
+out.textContent = "";
+say("");
+say(c("  ~ ~ ~  VIRTUAL OYSTER GARDEN  ~ ~ ~", "cyan"));
+say(c("  O   o    <><    o   O   <><", "dim"));
+say("");
+say(
+    "  Welcome! You will care for 50 baby oysters in a cage on a dock.",
+);
+say(
+    "  Each week you can do 2 things: check the water, scrub the cage,",
+);
+say("  count your oysters, or move the cage. Watch out for surprises!");
+say("  Captain Pearl the pelican gives free tips along the way.");
+say("");
+say(c("  What is your name, gardener?", "bold"));
+var nm = (await waitInput(null)).trim().slice(0, 20);
+var g = newGarden(nm || "Gardener");
+var weeks = shuffle([2, 3, 4, 5, 6, 7, 8])
+    .slice(0, 6)
+    .sort(function (a, b) {
+    return a - b;
+    });
+var evs = shuffle(EVENTS.slice());
+var plan = {};
+weeks.forEach(function (w, k) {
+    plan[w] = evs[k];
+});
+for (var week = 1; week <= WEEKS; week++) {
+    g.ap = 2;
+    header(g, week);
+    if (plan[week]) {
+    await playEvent(g, plan[week]);
+    } else if (week === 1) {
+    say("");
+    say(c("  Week one! Your baby oysters are settling in.", "green"));
+    }
+    while (true) {
+    say("");
+    say("  What now?   (action points left: " + g.ap + ")");
+    say("   1) Check the water      2) Scrub the cage");
+    say("   3) Count the oysters    4) Raise or lower the cage");
+    say("   5) Ask Captain Pearl (free)   6) End the week");
+    var pick = await ask("  Choose 1 to 6: ", [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+    ]);
+    if (pick === "5") {
+        tip();
+        continue;
+    }
+    if (pick === "6") {
+        break;
+    }
+    if (g.ap <= 0) {
+        say(c("  No action points left. End the week!", "yellow"));
+        continue;
+    }
+    g.ap--;
+    if (pick === "1") {
+        checkWater(g);
+    } else if (pick === "2") {
+        scrub(g);
+    } else if (pick === "3") {
+        measure(g, week);
+    } else {
+        moveCage(g);
+    }
+    }
+    endWeek(g, week);
+    await pause();
+}
+finalReport(g);
+}
+async function run() {
+while (true) {
+    await play();
+    say("");
+    await ask("  Type again to play once more: ", ["again"]);
+}
+}
+run();
+function sendHeight() {
+parent.postMessage(
+    {
+    type: "ostrea-height",
+    height: document.documentElement.scrollHeight,
+    },
+    "*",
+);
+}
+addEventListener("load", sendHeight);
+new ResizeObserver(sendHeight).observe(document.body);
+</script>
+{% endblock extrabody %}

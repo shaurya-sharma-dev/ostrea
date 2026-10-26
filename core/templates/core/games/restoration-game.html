@@ -1,0 +1,599 @@
+{% extends "core/bare-base.html" %}
+{% load static %}
+
+{% comment "License" %}
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at http://mozilla.org/MPL/2.0/.
+{% endcomment %}
+
+{% block extrahead %}
+<script src="{% static 'js/chart.js' %}"></script>
+<style>
+    :root {
+    --bg: #0b2025;
+    --fg: #e2f5f4;
+    --card: #102f34;
+    --muted: #b2d8d6;
+    --accent: #5cdcd5;
+    --line: #2bb6af;
+    --good: #2e8b57;
+    --mid: #d99a00;
+    --bad: #c0392b;
+    box-sizing: border-box;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    }
+    @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+        color-scheme: dark;
+        --bg: #0b2025;
+        --fg: #e2f5f4;
+        --card: #102f34;
+        --muted: #9bb5c1;
+        --accent: #5cdcd5;
+        --line: #2bb6af;
+        --good: #5cc98a;
+        --mid: #f0b840;
+        --bad: #ef7b6e;
+    }
+    }
+    :root[data-theme="dark"] {
+    color-scheme: dark;
+    --bg: #0b2025;
+    --fg: #e2f5f4;
+    --card: #102f34;
+    --muted: #9bb5c1;
+    --accent: #5cdcd5;
+    --line: #2bb6af;
+    --good: #5cc98a;
+    --mid: #f0b840;
+    --bad: #ef7b6e;
+    }
+    html {
+    scroll-padding-top: env(safe-area-inset-top, 0px);
+    }
+    body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--fg);
+    font:
+        17px/1.5 system-ui,
+        -apple-system,
+        "Segoe UI",
+        sans-serif;
+    }
+    .wrap {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 16px;
+    }
+    h1 {
+    color: #5cdcd5;
+    font-size: 1.6rem;
+    margin: 0.1em 0 0.3em;
+    }
+    h3 {
+    margin: 0.1em 0 0.3em;
+    }
+    .stats {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 10px;
+    }
+    .stats div {
+    flex: 1;
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 6px 10px;
+    text-align: center;
+    font-size: 0.85rem;
+    color: var(--muted);
+    }
+    .stats b {
+    display: block;
+    font-size: 1.25rem;
+    color: var(--fg);
+    }
+    .card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 12px 16px;
+    margin: 10px 0;
+    }
+    svg {
+    width: 100%;
+    height: auto;
+    display: block;
+    border-radius: 12px;
+    }
+    .opts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    }
+    .opts button {
+    background: #164e54;
+    color: #e2f5f4;
+    border: 1px solid #2bb6af;
+    font: inherit;
+    font-size: 0.95rem;
+    border: 2px solid var(--line);
+    border-radius: 12px;
+    padding: 8px 12px;
+    background: var(--card);
+    color: var(--fg);
+    cursor: pointer;
+    min-height: 44px;
+    }
+    .opts button[aria-pressed="true"] {
+    border-color: var(--accent);
+    background: rgba(11, 110, 138, 0.14);
+    font-weight: 700;
+    }
+    .opts button:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+    }
+    .btn {
+    background: #164e54;
+    color: #e2f5f4;
+    border: 1px solid #2bb6af;
+    font: inherit;
+    font-weight: 700;
+    padding: 10px 18px;
+    border: 0;
+    border-radius: 12px;
+    background: var(--accent);
+    color: #fff;
+    cursor: pointer;
+    min-height: 44px;
+    margin-top: 10px;
+    }
+    .plot {
+    position: relative;
+    height: 200px;
+    }
+    ul {
+    padding-left: 20px;
+    margin: 6px 0;
+    }
+    li {
+    margin: 4px 0;
+    }
+    .good {
+    color: var(--good);
+    }
+    .bad {
+    color: var(--bad);
+    }
+    .note {
+    font-size: 0.8rem;
+    color: var(--muted);
+    }
+
+    button:hover,
+    .btn:hover {
+    background: #1d5f66;
+    }
+    a {
+    color: #5cdcd5;
+    }
+    .src a {
+    color: #5cdcd5;
+    text-decoration: underline;
+    }
+</style>
+{% endblock extrahead %}
+
+{% block content %}
+<div class="wrap">
+    <h1>Restoration Challenge</h1>
+    <div class="stats">
+    <div>Level<b id="lv">1 of 3</b></div>
+    <div>Points left<b id="pt">0</b></div>
+    <div>Stars<b id="sr">0</b></div>
+    </div>
+    <div class="card">
+    <svg
+        id="scene"
+        viewBox="0 0 400 210"
+        role="img"
+        aria-label="Underwater oyster restoration scene"
+    ></svg>
+    </div>
+    <div class="card">
+    <h3 id="ttl"></h3>
+    <p id="goal" style="margin: 0 0 8px"></p>
+    <div class="opts" id="str"></div>
+    <button class="btn" id="go">Test my site</button>
+    </div>
+    <div class="card" id="res" hidden>
+    <p id="msg" style="margin: 0 0 6px; font-weight: 700"></p>
+    <div class="plot">
+        <canvas
+        id="mc"
+        role="img"
+        aria-label="Bar chart of the four results"
+        ></canvas>
+    </div>
+    <ul id="why"></ul>
+    <button class="btn" id="nx"></button>
+    </div>
+    <p class="note">
+    This is a simple model made for learning. The numbers are not scientific
+    predictions. Real restoration depends on many more things, and
+    scientists check every site by monitoring it.
+    </p>
+</div>
+{% endblock content %}
+
+{% block extrabody %}
+<script>
+var LV = [
+    {
+        t: "Level 1: A muddy farm creek",
+        desc: "Medium salt, soft mud bottom, farm fields nearby.",
+        sal: "mid",
+        bot: "mud",
+        land: "farm",
+        budget: 5,
+        sv: 60,
+    },
+    {
+        t: "Level 2: A salty city bay",
+        desc: "High salt, hard bottom, city streets nearby.",
+        sal: "high",
+        bot: "hard",
+        land: "city",
+        budget: 6,
+        sv: 70,
+    },
+    {
+        t: "Level 3: A muddy city river",
+        desc: "Medium salt, soft mud bottom, city streets nearby.",
+        sal: "mid",
+        bot: "mud",
+        land: "city",
+        budget: 8,
+        sv: 70,
+    },
+];
+var ST = [
+["reef", "Rebuild a reef", 3],
+["shell", "Add old shell", 2],
+["runoff", "Reduce runoff", 3],
+["harvest", "Manage harvesting", 1],
+["monitor", "Monitor survival", 1],
+];
+var cs = getComputedStyle(document.documentElement);
+function tok(n) {
+return cs.getPropertyValue(n).trim();
+}
+function $(id) {
+return document.getElementById(id);
+}
+var lvl,
+pick,
+stars,
+tested,
+mc = null,
+passed;
+function spent() {
+var t = 0;
+ST.forEach(function (s) {
+    if (pick[s[0]]) {
+    t += s[2];
+    }
+});
+return t;
+}
+function render() {
+var L = LV[lvl],
+    left = L.budget - spent();
+$("lv").textContent = lvl + 1 + " of 3";
+$("pt").textContent = left;
+$("sr").textContent = stars;
+$("ttl").textContent = L.t;
+$("goal").textContent =
+    L.desc +
+    " Goal: oyster survival at least " +
+    L.sv +
+    ", reef at least 50, clear water at least 40.";
+$("str").innerHTML = "";
+ST.forEach(function (s) {
+    var b = document.createElement("button");
+    b.setAttribute("aria-pressed", pick[s[0]] ? "true" : "false");
+    b.textContent = s[1] + " (" + s[2] + ")";
+    if (!pick[s[0]]) {
+    if (s[2] > left) {
+        b.disabled = true;
+    }
+    }
+    b.addEventListener("click", function () {
+    pick[s[0]] = !pick[s[0]];
+    $("res").hidden = true;
+    render();
+    draw(model().m);
+    });
+    $("str").appendChild(b);
+});
+}
+function cl(n) {
+return Math.max(0, Math.min(100, Math.round(n)));
+}
+function model() {
+var L = LV[lvl],
+    st = pick,
+    why = [];
+var pol = { forest: 20, farm: 55, city: 70 }[L.land];
+var wq = 100 - pol;
+if (st.runoff) {
+    wq += 35;
+    why.push(
+    "Reducing runoff keeps extra mud, fertilizer and trash out of the water, so the water is cleaner.",
+    );
+} else if (pol > 40) {
+    why.push(
+    "Rain washes dirt and fertilizer into the water. Cloudy water makes it harder for oysters to eat and grow.",
+    );
+}
+wq = cl(wq);
+var hard = L.bot === "hard" ? 45 : 0;
+if (st.shell) {
+    hard += 40;
+    why.push("Old shell gives baby oysters a hard place to settle.");
+} else if (L.bot === "mud") {
+    why.push(
+    "Baby oysters sink into soft mud. A hard base, like old shell, would help a lot.",
+    );
+}
+var reef = hard;
+if (st.reef) {
+    reef += hard > 0 ? 35 : 8;
+    why.push(
+    hard > 0
+        ? "The rebuilt reef stands up off the bottom, where water brings food."
+        : "A reef built on soft mud sinks, so it helps only a little.",
+    );
+}
+reef = cl(reef);
+var sv = { low: 15, mid: 65, high: 55 }[L.sal];
+if (L.sal === "high") {
+    why.push(
+    "Very salty water has lots of food, but oyster diseases spread more easily.",
+    );
+} else {
+    why.push("Medium salt is a good fit for oysters.");
+}
+sv += (wq - 50) * 0.3 + reef * 0.2;
+if (st.harvest) {
+    sv += 12;
+    why.push(
+    "Managing harvesting leaves older oysters in the water to make baby oysters.",
+    );
+} else {
+    sv -= 12;
+    why.push(
+    "With no harvest rules, people could take the biggest oysters before they have babies.",
+    );
+}
+if (st.monitor) {
+    sv += 5;
+    why.push("Monitoring helps you find problems early.");
+}
+sv = cl(sv);
+var wild = cl(reef * 0.4 + sv * 0.4 + wq * 0.2);
+return {
+    m: [
+    ["Water clearness", wq],
+    ["Reef habitat", reef],
+    ["Oyster survival", sv],
+    ["Fish and crab homes", wild],
+    ],
+    why: why,
+};
+}
+function draw(M) {
+var wq = M[0][1],
+    reef = M[1][1],
+    sv = M[2][1],
+    wild = M[3][1],
+    L = LV[lvl];
+var o =
+    '<rect width="400" height="210" fill="#4aa3c7"/><rect width="400" height="210" fill="#7a5a32" opacity="' +
+    ((100 - wq) / 130).toFixed(2) +
+    '"/>';
+o +=
+    '<rect y="170" width="400" height="40" fill="' +
+    (L.bot === "mud" ? "#6b4f33" : "#8a8f94") +
+    '"/>';
+var h = Math.round(reef * 0.5);
+o +=
+    '<path d="M60 172 Q200 ' + (172 - h) + ' 340 172Z" fill="#c9bfae"/>';
+var n = Math.round(sv / 6),
+    i,
+    x,
+    y;
+for (i = 0; i < n; i++) {
+    x = 80 + ((i * 53) % 240);
+    y =
+    170 -
+    Math.round(h * (1 - Math.abs(x - 200) / 140) * 0.85) +
+    ((i * 7) % 5);
+    o +=
+    '<ellipse cx="' +
+    x +
+    '" cy="' +
+    y +
+    '" rx="9" ry="6" fill="#e9e1d0" stroke="#7d725f"/>';
+}
+var f = Math.round(wild / 20);
+for (i = 0; i < f; i++) {
+    x = 40 + ((i * 83) % 300);
+    y = 60 + ((i * 37) % 70);
+    o +=
+    '<g transform="translate(' +
+    x +
+    "," +
+    y +
+    ')"><ellipse rx="12" ry="6" fill="#f2b134"/><path d="M12 0L21 -6L21 6Z" fill="#f2b134"/><circle cx="-6" cy="-1" r="1.5" fill="#222"/></g>';
+}
+$("scene").innerHTML = o;
+}
+function test() {
+var L = LV[lvl],
+    r = model(),
+    M = r.m;
+draw(M);
+var ok = M[2][1] >= L.sv;
+if (ok) {
+    ok = M[1][1] >= 50;
+}
+if (ok) {
+    ok = M[0][1] >= 40;
+}
+passed = ok;
+var avg = (M[0][1] + M[1][1] + M[2][1] + M[3][1]) / 4,
+    earn = 0;
+if (ok) {
+    earn = avg >= 75 ? 3 : avg >= 60 ? 2 : 1;
+}
+$("res").hidden = false;
+$("msg").innerHTML = ok
+    ? '<span class="good">You did it! ' +
+    "★".repeat(earn) +
+    "☆".repeat(3 - earn) +
+    "</span>"
+    : '<span class="bad">Not quite there yet. Check the goal and try a different mix.</span>';
+$("why").innerHTML = r.why
+    .map(function (w) {
+    return "<li>" + w + "</li>";
+    })
+    .join("");
+var cols = M.map(function (m) {
+    return tok(m[1] >= 65 ? "--good" : m[1] >= 35 ? "--mid" : "--bad");
+});
+var data = {
+    labels: M.map(function (m) {
+    return m[0];
+    }),
+    datasets: [
+    {
+        data: M.map(function (m) {
+        return m[1];
+        }),
+        backgroundColor: cols,
+        borderRadius: 6,
+    },
+    ],
+};
+if (mc === null) {
+    mc = new Chart($("mc"), {
+    type: "bar",
+    data: data,
+    options: {
+        indexAxis: "y",
+        maintainAspectRatio: false,
+        plugins: {
+        legend: { display: false },
+        tooltip: {
+            callbacks: {
+            label: function (x) {
+                return x.parsed.x + " out of 100";
+            },
+            },
+        },
+        },
+        scales: {
+        x: { min: 0, max: 100 },
+        y: { grid: { display: false } },
+        },
+    },
+    });
+} else {
+    mc.data = data;
+}
+mc.options.scales.x.ticks.color = tok("--muted");
+mc.options.scales.y.ticks.color = tok("--muted");
+mc.options.scales.x.grid.color = tok("--line");
+mc.resize();
+mc.update();
+tested = { earn: earn };
+var nx = $("nx");
+if (ok) {
+    nx.textContent = lvl === 2 ? "See my results" : "Next level";
+} else {
+    nx.textContent = "Try again";
+}
+}
+function advance() {
+if (passed) {
+    stars += tested.earn;
+    if (lvl === 2) {
+    final();
+    return;
+    }
+    lvl++;
+    pick = {};
+    $("res").hidden = true;
+    render();
+    draw(model().m);
+} else {
+    $("res").hidden = true;
+}
+}
+function final() {
+$("sr").textContent = stars;
+$("ttl").textContent = "Restoration complete!";
+$("goal").textContent =
+    "You earned " +
+    stars +
+    " of 9 stars. Great restoration needs clean water, a hard base, rules for harvesting and careful monitoring, working together.";
+$("str").innerHTML = "";
+$("go").hidden = true;
+$("res").hidden = true;
+var b = document.createElement("button");
+b.className = "btn";
+b.textContent = "Play again";
+b.addEventListener("click", function () {
+    $("go").hidden = false;
+    begin();
+});
+$("str").appendChild(b);
+parent.postMessage(
+    {
+    type: "ostrea-score",
+    game: "restoration-challenge",
+    score: stars,
+    max: 9,
+    },
+    "*",
+);
+}
+function begin() {
+lvl = 0;
+pick = {};
+stars = 0;
+$("res").hidden = true;
+render();
+draw(model().m);
+}
+$("go").addEventListener("click", test);
+$("nx").addEventListener("click", advance);
+begin();
+function sendHeight() {
+parent.postMessage(
+    {
+    type: "ostrea-height",
+    height: document.documentElement.scrollHeight,
+    },
+    "*",
+);
+}
+addEventListener("load", sendHeight);
+new ResizeObserver(sendHeight).observe(document.body);
+</script>
+{% endblock extrabody %}

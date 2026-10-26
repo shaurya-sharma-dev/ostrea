@@ -1,0 +1,486 @@
+{% extends "core/bare-base.html" %}
+{% load static %}
+
+{% comment "License" %}
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at http://mozilla.org/MPL/2.0/.
+{% endcomment %}
+
+{% block extrahead %}
+<style>
+:root {
+--aqua: #5cdcd5;
+--text: #e2f5f4;
+--button: #164e54;
+--hover: #1d5f66;
+--border: #2bb6af;
+--deep: #082f35;
+--panel: #10434a;
+--panel2: #123b42;
+}
+* {
+box-sizing: border-box;
+}
+body {
+margin: 0;
+background:
+    radial-gradient(circle at 15% 0%, #17616a 0, transparent 34%),
+    linear-gradient(145deg, #062c33, #0a3d44 60%, #082f35);
+color: var(--text);
+font-family: ui-rounded, "Trebuchet MS", system-ui, sans-serif;
+min-height: 100vh;
+}
+h1,
+h2,
+h3,
+.accent {
+color: var(--aqua);
+}
+button,
+select,
+input,
+textarea {
+font: inherit;
+}
+button {
+cursor: pointer;
+transition:
+    background 0.15s,
+    transform 0.15s;
+}
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+outline: 3px solid #9af4ed;
+outline-offset: 3px;
+}
+.btn {
+background: var(--button);
+border: 1px solid var(--border);
+border-radius: 14px;
+padding: 0.7rem 1rem;
+color: var(--text);
+font-weight: 700;
+}
+.btn:hover {
+background: var(--hover);
+}
+.btn:active {
+transform: scale(0.98);
+}
+.btn:disabled {
+opacity: 0.4;
+cursor: not-allowed;
+}
+.btn.primary {
+background: var(--aqua);
+color: #08363b;
+border-color: #9af4ed;
+}
+.btn.primary:hover {
+background: #8ae9e3;
+}
+.btn.ghost {
+background: transparent;
+}
+.panel {
+background: rgba(16, 67, 74, 0.88);
+border: 1px solid rgba(43, 182, 175, 0.55);
+border-radius: 24px;
+box-shadow: 0 16px 38px #001b2040;
+}
+.tab {
+border: 1px solid var(--border);
+background: #103e45;
+color: var(--text);
+border-radius: 999px;
+padding: 0.65rem 1rem;
+white-space: nowrap;
+}
+.tab[aria-selected="true"] {
+background: var(--aqua);
+color: #07383d;
+font-weight: 800;
+}
+.small-label {
+font-size: 0.75rem;
+text-transform: uppercase;
+letter-spacing: 0.12em;
+color: #9cece7;
+font-weight: 800;
+}
+.muted {
+color: #b7dcda;
+}
+.input {
+width: 100%;
+background: #082f35;
+border: 1px solid #367c80;
+border-radius: 12px;
+padding: 0.8rem;
+color: var(--text);
+}
+.input::placeholder {
+color: #8bb7b6;
+}
+.option {
+width: 100%;
+text-align: left;
+padding: 1rem;
+border: 1px solid #367c80;
+background: #0c3940;
+border-radius: 15px;
+color: var(--text);
+}
+.option:hover {
+background: #15535a;
+}
+.option.correct {
+border-color: #79e6b1;
+background: #154b47;
+}
+.option.wrong {
+border-color: #ffb4a8;
+background: #593b3a;
+}
+.bubble {
+position: absolute;
+border-radius: 50%;
+border: 1px solid #8be9e333;
+pointer-events: none;
+}
+.shell {
+font-size: 2.2rem;
+}
+.flashcard {
+min-height: 270px;
+display: flex;
+flex-direction: column;
+justify-content: center;
+align-items: center;
+text-align: center;
+padding: 2rem;
+cursor: pointer;
+background: linear-gradient(145deg, #17616a, #10434a);
+border: 2px solid #2bb6af;
+border-radius: 28px;
+position: relative;
+overflow: hidden;
+}
+.flashcard:before {
+content: "";
+position: absolute;
+width: 190px;
+height: 190px;
+border: 1px solid #8be9e333;
+border-radius: 50%;
+right: -65px;
+top: -70px;
+}
+.flashcard:after {
+content: "";
+position: absolute;
+width: 120px;
+height: 120px;
+border: 1px solid #8be9e322;
+border-radius: 50%;
+left: -35px;
+bottom: -55px;
+}
+.organism-card {
+border: 1px solid #367c80;
+background: #0b3940;
+border-radius: 18px;
+padding: 1rem;
+min-height: 110px;
+text-align: center;
+color: var(--text);
+}
+.organism-card.selected {
+border: 2px solid var(--aqua);
+background: #15535a;
+}
+.organism-card.matched {
+border-color: #79e6b1;
+background: #164944;
+opacity: 0.9;
+}
+.organism-icon {
+font-size: 2rem;
+display: block;
+margin-bottom: 0.35rem;
+}
+.slide-progress {
+height: 7px;
+background: #28565b;
+border-radius: 99px;
+overflow: hidden;
+}
+.slide-progress span {
+height: 100%;
+display: block;
+background: var(--aqua);
+transition: width 0.2s;
+}
+.report-sheet {
+background: #eaf8f5;
+color: #173f43;
+border-radius: 18px;
+padding: 1.5rem;
+}
+.report-sheet h3 {
+color: #126a70;
+}
+.report-sheet p {
+white-space: pre-wrap;
+overflow-wrap: anywhere;
+}
+.report-sheet .report-field {
+border-bottom: 1px solid #9bc7c3;
+padding: 0.45rem 0 1rem;
+margin-bottom: 0.6rem;
+}
+@media (min-width: 768px) {
+.main-grid {
+    display: grid;
+    grid-template-columns: 220px minmax(0, 1fr);
+    gap: 1.5rem;
+}
+.side-nav {
+    position: sticky;
+    top: 1rem;
+    align-self: start;
+}
+}
+@media print {
+body {
+    background: white !important;
+    color: #173f43 !important;
+}
+.no-print,
+header,
+.side-nav,
+.screen-only {
+    display: none !important;
+}
+main {
+    display: block !important;
+    padding: 0 !important;
+}
+.panel {
+    background: white !important;
+    box-shadow: none !important;
+    border: 0 !important;
+}
+.report-sheet {
+    border: 1px solid #9bc7c3;
+    break-inside: avoid;
+}
+.print-report {
+    display: block !important;
+}
+#report-preview {
+    display: block !important;
+}
+.print-only {
+    display: block !important;
+}
+}
+</style>
+{% endblock extrahead %}
+
+{% block content %}
+<header class="max-w-5xl mx-auto px-4 sm:px-6 pt-7 pb-5">
+    <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight">
+    Oyster Garden: Cause and Effect
+    </h1>
+    <p class="muted mt-2">
+    Explore how environmental conditions may affect oyster gardens. For each question, choose a possible effect.
+    </p>
+</header>
+<main class="max-w-5xl mx-auto px-4 sm:px-6 pb-12">
+    <section class="panel p-4 sm:p-7">
+    <div class="flex justify-between mb-3">
+        <p id="progress" class="muted text-sm"></p>
+        <span id="score" class="accent font-bold"></span>
+    </div>
+    <div class="slide-progress mb-5"><span id="bar"></span></div>
+    <div
+        class="rounded-2xl bg-teal-950/50 border border-teal-700/70 p-5 mb-4"
+    >
+        <p class="small-label">What could happen?</p>
+        <h3 id="prompt" class="text-xl font-bold mt-2 text-teal-100"></h3>
+    </div>
+    <div id="options" class="grid gap-3"></div>
+    <div
+        id="feedback"
+        class="hidden mt-4 rounded-2xl border p-4"
+        aria-live="polite"
+    ></div>
+    <div class="flex justify-end gap-2 mt-5">
+        <button id="restart" class="btn ghost">Restart</button
+        ><button id="next" class="btn primary" disabled>Next question</button>
+    </div>
+    <div id="finish" class="hidden mt-5 rounded-2xl bg-teal-950/60 p-5">
+        <h3 class="text-xl font-bold">Nice scientific thinking!</h3>
+        <p class="muted mt-2">
+        Environmental conditions can influence an oyster garden. Scientists
+        compare observations and gather more evidence before drawing
+        conclusions.
+        </p>
+        <p id="final-score" class="accent font-bold mt-3"></p>
+    </div>
+    <p class="muted text-xs mt-5">
+        Sources:
+        <a
+        class="underline text-teal-200"
+        href="https://www.fisheries.noaa.gov/feature-story/oyster-reefs-provide-habitat-and-protect-coastlines"
+        target="_blank"
+        rel="noopener noreferrer"
+        >NOAA: Oyster reefs provide habitat</a
+        >
+        ·
+        <a
+        class="underline text-teal-200"
+        href="https://www.chesapeakebay.net/discover/field-guide/entry/eastern-oyster"
+        target="_blank"
+        rel="noopener noreferrer"
+        >Chesapeake Bay Program: Eastern oyster</a
+        >
+    </p>
+    </section>
+</main>
+{% endblock content %}
+
+{% block extrabody %}
+<script>
+const qs = [
+[
+    "Excess sediment enters the water.",
+    [
+    "The water may become cloudier.",
+    "Every oyster will grow faster.",
+    "The water will always become saltier.",
+    ],
+    0,
+    "Sediment can make water cloudy. Its effects depend on how much sediment enters and how long it remains.",
+],
+[
+    "Suitable hard surfaces become available.",
+    [
+    "Oyster larvae may have places to attach and grow.",
+    "All larvae will attach successfully.",
+    "The water temperature must drop.",
+    ],
+    0,
+    "Oyster larvae need suitable hard surfaces. Having a surface does not guarantee attachment or survival.",
+],
+[
+    "Water quality becomes poor.",
+    [
+    "Oysters and other organisms may experience environmental stress.",
+    "Every organism will disappear immediately.",
+    "Oysters will always become larger.",
+    ],
+    0,
+    "Poor water quality can stress organisms, but the result depends on the conditions and how long they last.",
+],
+[
+    "Water temperature changes.",
+    [
+    "Conditions for oyster growth and survival may change.",
+    "Salinity must stay exactly the same.",
+    "The oyster count must double.",
+    ],
+    0,
+    "Temperature can influence oysters. A temperature change alone does not tell us exactly what will happen.",
+],
+[
+    "Communities monitor restored oyster reefs.",
+    [
+    "They can gather information about reef conditions and restoration progress.",
+    "Monitoring guarantees the reef will succeed.",
+    "They no longer need to collect evidence.",
+    ],
+    0,
+    "Monitoring helps people track conditions and make evidence-informed decisions. It does not guarantee an outcome.",
+],
+[
+    "Oyster habitat is damaged.",
+    [
+    "Oysters may have fewer suitable places to live and grow.",
+    "All nearby animals must leave forever.",
+    "The water becomes fresh water.",
+    ],
+    0,
+    "Damage can reduce suitable habitat. Scientists observe the site and collect evidence to understand the effects.",
+],
+];
+let n = 0,
+done = false,
+score = 0;
+function render() {
+let q = qs[n];
+document.getElementById("progress").textContent =
+    `Question ${n + 1} of ${qs.length}`;
+document.getElementById("score").textContent = `${score} correct`;
+document.getElementById("bar").style.width =
+    `${((n + 1) / qs.length) * 100}%`;
+document.getElementById("prompt").textContent = q[0];
+document.getElementById("options").innerHTML = "";
+document.getElementById("feedback").classList.add("hidden");
+document.getElementById("finish").classList.add("hidden");
+document.getElementById("next").disabled = true;
+document.getElementById("next").textContent =
+    n === qs.length - 1 ? "See summary" : "Next question";
+done = false;
+q[1].forEach((x, i) => {
+    let b = document.createElement("button");
+    b.className = "option";
+    b.textContent = x;
+    b.onclick = () => answer(i);
+    document.getElementById("options").appendChild(b);
+});
+}
+function answer(i) {
+if (done) return;
+done = true;
+let q = qs[n],
+    ok = i === q[2];
+if (ok) score++;
+[...document.querySelectorAll("#options button")].forEach((b, j) => {
+    b.disabled = true;
+    if (j === q[2]) b.classList.add("correct");
+    else if (j === i) b.classList.add("wrong");
+});
+let f = document.getElementById("feedback");
+f.classList.remove("hidden");
+f.style.borderColor = ok ? "#79e6b1" : "#ffb4a8";
+f.textContent = (ok ? "Good match. " : "Try again next time. ") + q[3];
+document.getElementById("score").textContent = `${score} correct`;
+document.getElementById("next").disabled = false;
+}
+document.getElementById("next").onclick = () => {
+if (!done) return;
+if (n < qs.length - 1) {
+    n++;
+    render();
+} else {
+    document.getElementById("options").innerHTML = "";
+    document.getElementById("feedback").classList.add("hidden");
+    document.getElementById("next").disabled = true;
+    document.getElementById("finish").classList.remove("hidden");
+    document.getElementById("final-score").textContent =
+    `You answered ${score} of ${qs.length} questions correctly.`;
+}
+};
+document.getElementById("restart").onclick = () => {
+n = 0;
+score = 0;
+render();
+};
+render();
+</script>
+{% endblock extrabody %}
